@@ -809,98 +809,7 @@ public class BusMonedero : IBusMonedero
         return response;
     }
 
-    //Regresa a que servicios tiene acceso el monedero, este servicio obtiene la tarifa del usuario, se debe mejorar este servicio **********
-    public async Task<IMDResponse<EntOperacionesMonedero>> BValidaMonedero(Guid uIdMonedero, string token)
-    {
-        IMDResponse<EntOperacionesMonedero> response = new IMDResponse<EntOperacionesMonedero>();
-
-        string metodo = nameof(this.BValidaMonedero);
-        _logger.LogInformation(IMDSerializer.Serialize(67823464156315, $"Inicia {metodo}(Guid uIdMonedero, string token)", uIdMonedero, token));
-
-        try
-        {
-            //Ing. Benigno Manzano
-            //Se valida los monederos para que sepamos que operaciones se permiten
-            var httpResponseMonedero = BDatosMonedero(uIdMonedero).Result;
-            string mensajeMonedero = Menssages.BusMonedero;
-            if (httpResponseMonedero.HasError != true)
-            {
-                var httpResponseCatalogo = await BTipoTarifa(httpResponseMonedero.Result.idTipoTarifa);
-                var resPermisos = await BValidaMonederoV2(uIdMonedero, token, httpResponseCatalogo.Result.tipoTarjeta);
-                if (resPermisos.HasError != true)
-                    response.SetSuccess(resPermisos.Result, resPermisos.Message);
-                else
-                {
-                    response.ErrorCode = resPermisos.ErrorCode;
-                    response.SetError(resPermisos.Message);
-                }
-            }
-            else
-            {
-                response.ErrorCode = httpResponseMonedero.ErrorCode;
-                response.SetError(httpResponseMonedero.Message);
-            }
-            /*
-            var permisosMonedero = await BEstatusMonedero(uIdMonedero, token);
-            string mensajeMonedero = Menssages.BusMonedero;
-            if (permisosMonedero.HasError != true)
-            {
-                var permisos = permisosMonedero.Result;
-                EntOperacionesMonedero resPermisos = new EntOperacionesMonedero();
-                if (!(string.IsNullOrEmpty(permisos.sTodasOperaciones)))
-                {
-                    resPermisos.bTodasOperaciones = true;
-                    resPermisos.bDetalles = true;
-                    resPermisos.bMovimientos = true;
-                    resPermisos.bRecarga = true;
-                    resPermisos.bTraspasos = true;
-                    resPermisos.bGenerarQR = true;
-                    resPermisos.bVerTarjetas = true;
-                }
-                else
-                {
-                    resPermisos.bTodasOperaciones = (string.IsNullOrEmpty(permisos.sTodasOperaciones)) ? false : true;
-                    resPermisos.bDetalles = (string.IsNullOrEmpty(permisos.sDetalles)) ? false : true;
-                    resPermisos.bMovimientos = (string.IsNullOrEmpty(permisos.sMovimientos)) ? false : true;
-                    resPermisos.bRecarga = (string.IsNullOrEmpty(permisos.sRecarga)) ? false : true;
-                    resPermisos.bTraspasos = (string.IsNullOrEmpty(permisos.sTraspasos)) ? false : true;
-                    resPermisos.bGenerarQR = (string.IsNullOrEmpty(permisos.sGenerarQR)) ? false : true;
-                    resPermisos.bVerTarjetas = (string.IsNullOrEmpty(permisos.sVerTarjetas)) ? false : true;
-                }
-
-
-                response.ErrorCode = permisosMonedero.ErrorCode;
-                response.SetSuccess(resPermisos, mensajeMonedero + permisosMonedero.Message);
-
-
-            }
-            else
-            {
-                response.ErrorCode = permisosMonedero.ErrorCode;
-
-                if (permisosMonedero.ErrorCode == EntConfiguracionEstatusMonedero.iErrorCodeInformacion)
-                {
-                    response.SetError(mensajeMonedero + permisosMonedero.Message);
-                }
-                else
-                {
-                    response.SetError(permisosMonedero.Message);
-                }
-
-                return response;
-            }
-            */
-        }
-        catch (Exception ex)
-        {
-            response.ErrorCode = 67823464157092;
-            response.SetError(ex);
-
-            _logger.LogError(IMDSerializer.Serialize(67823464157092, $"Error en {metodo}(Guid uIdMonedero, string token): {ex.Message}", uIdMonedero, token, ex, response));
-        }
-        return response;
-    }
-
+    
     //Ing. Benigno Manzano
     //Se agrega un nueva validacion para que se reciba la El tipo de tarjeta que esto ayuda a otras validaciones
     public async Task<IMDResponse<EntOperacionesMonedero>> BValidaMonederoV2(Guid uIdMonedero, string token, int? iTipoTarjeta = null)
@@ -1413,38 +1322,6 @@ public class BusMonedero : IBusMonedero
             response.ErrorCode = metodo.iCodigoError;
             response.SetError(ex);
             _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(Guid uIdTipoTarifa, string token): {ex.Message}", uIdTipoTarifa, ex, response));
-        }
-        return response;
-    }
-
-    [IMDMetodo(67823464878148, 67823464877371)]
-    public async Task<IMDResponse<List<EntOrden>>> BObtenerByListOrdenes(List<Guid>? uIdsOrdenes, string token)
-    {
-        IMDResponse<List<EntOrden>> response = new IMDResponse<List<EntOrden>>();
-        IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
-        _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo}(List<Guid> uIdsOrdenes, string token)", uIdsOrdenes, token));
-
-        try
-        {
-            string URLBasePagosQuery = Environment.GetEnvironmentVariable("URLBASE_PAGOS_QUERYS") ?? string.Empty;
-            string endGetOrdenesByList = Environment.GetEnvironmentVariable("ENDPOINT_GET_ORDENES_BY_LIST") ?? string.Empty;
-
-            var apiResponse = await _servGenerico.SPostBody(URLBasePagosQuery, endGetOrdenesByList, uIdsOrdenes, token);
-
-            if (apiResponse.HasError)
-            {
-                return response.GetResponse(apiResponse);
-            }
-
-            var listaOrdenes = System.Text.Json.JsonSerializer.Deserialize<List<EntOrden>>(apiResponse.Result.ToString());
-
-            response.SetSuccess(listaOrdenes);
-        }
-        catch (Exception ex)
-        {
-            response.ErrorCode = metodo.iCodigoError;
-            response.SetError(ex);
-            _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(List<Guid> uIdsOrdenes, string token): {ex.Message}", uIdsOrdenes, token, ex, response));
         }
         return response;
     }

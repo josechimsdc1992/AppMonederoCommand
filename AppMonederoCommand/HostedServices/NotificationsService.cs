@@ -313,37 +313,6 @@ namespace AppMonederoCommand.Api.HostedServices
                });
                 #endregion
 
-                #region Tickets
-                _rabbitNotifications.ReceiveAsync<QueueMessage<EntReplicaTicket>>(RoutingKeys.TicketCreacion.GetDescription(), _exchangeConfig, async x =>
-                {
-                    _logger.LogInformation($"MessageId: {x.uMessageId}, SourceSystem: {x.sSourceSystem}, Timestamp: {x.dtTimestamp}");
-                    using (var scope = _serviceScopeFactory.CreateScope())
-                    {
-                        IDatTicket _datTicket = scope.ServiceProvider.GetRequiredService<IDatTicket>();
-                        await _datTicket.DSave(x.Content);
-                    };
-                });
-
-                _rabbitNotifications.ReceiveAsync<QueueMessage<EntReplicaTicket>>(RoutingKeys.TicketModificacion.GetDescription(), _exchangeConfig, async x =>
-                {
-                    _logger.LogInformation($"MessageId: {x.uMessageId}, SourceSystem: {x.sSourceSystem}, Timestamp: {x.dtTimestamp}");
-                    using (var scope = _serviceScopeFactory.CreateScope())
-                    {
-                        IDatTicket _datTicket = scope.ServiceProvider.GetRequiredService<IDatTicket>();
-                        await _datTicket.DUpdateCancelado(x.Content);
-                    };
-                });
-
-                _rabbitNotifications.ReceiveAsync<QueueMessage<EntReplicaUpdateTicket>>(RoutingKeys.TicketUsadoApp.GetDescription(), _exchangeConfig, async x =>
-                {
-                    _logger.LogInformation($"MessageId: {x.uMessageId}, SourceSystem: {x.sSourceSystem}, Timestamp: {x.dtTimestamp}");
-                    using (var scope = _serviceScopeFactory.CreateScope())
-                    {
-                        IDatTicket _datTicket = scope.ServiceProvider.GetRequiredService<IDatTicket>();
-                        await _datTicket.DUpdateUsado(x.Content);
-                    };
-                });
-                #endregion
 
                 #region TipoOperaciones
 

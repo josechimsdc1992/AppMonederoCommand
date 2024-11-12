@@ -29,15 +29,12 @@ public partial class TransporteContext : DbContext
 
     public virtual DbSet<HistorialRecuperacionToken> HistorialRecuperacionToken { get; set; }
 
-    public virtual DbSet<HistorialBoletoVirtual> HistorialBoletoVirtual { get; set; }
-
     public virtual DbSet<TarjetaUsuario> TarjetaUsuario { get; set; }
 
     public virtual DbSet<UsuarioActualizaTelefono> UsuarioActualizaTelefono { get; set; }
     public virtual DbSet<EstadoDeCuenta> EstadoDeCuenta { get; set; }
     public virtual DbSet<TiposTarifa> TiposTarifa { get; set; }
     public virtual DbSet<Motivo> Motivo { get; set; }
-    public virtual DbSet<Ticket> Ticket { get; set; }
     public virtual DbSet<TipoOperaciones> TipoOperaciones { get; set; }
     public virtual DbSet<EntTarjetas> Tarjetas { get; set; }
 
@@ -53,13 +50,11 @@ public partial class TransporteContext : DbContext
         modelBuilder.ApplyConfiguration(new MapFirebaseToken());
         modelBuilder.ApplyConfiguration(new MapHistorialRecuperarCuenta());
         modelBuilder.ApplyConfiguration(new MapHistorialRecuperacionToken());
-        modelBuilder.ApplyConfiguration(new MapHistorialBoletoVirtual());
         modelBuilder.ApplyConfiguration(new MapTarjetaUsuario());
         modelBuilder.ApplyConfiguration(new MapUsuarioActualizaTelefono());
         modelBuilder.ApplyConfiguration(new MapEstadoDeCuenta());
         modelBuilder.ApplyConfiguration(new MapTiposTarifa());
         modelBuilder.ApplyConfiguration(new MapMotivo());
-        modelBuilder.ApplyConfiguration(new MapTicket());
         modelBuilder.ApplyConfiguration(new MapTipoOperaciones());
 
         OnModelCreatingPartial(modelBuilder);

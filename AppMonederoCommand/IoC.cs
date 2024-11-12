@@ -62,10 +62,6 @@ namespace AppMonederoCommand.Api
             #endregion
 
 
-            #region Boletos Service
-            services.AddScoped<IBusBoleto, BusBoleto>();
-            services.AddScoped<IDatHistorialBoletoVirtual, DatHistorialBoletoVirtual>();
-            #endregion
 
 
             #region Folio
@@ -74,10 +70,6 @@ namespace AppMonederoCommand.Api
 
             #region Lenguajes
             services.AddScoped<IBusLenguaje, BusLenguaje>();
-            #endregion
-
-            #region Tickets Tour
-            services.AddScoped<IBusTicketsTour, BusTicketsTour>();
             #endregion
 
             #region Azure Blob Storage
@@ -98,10 +90,7 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IDatMotivos, DatMotivos>();
             #endregion
 
-            #region Ticket
-            services.AddScoped<IBusTicket, BusTicket>();
-            services.AddScoped<IDatTicket, DatTicket>();
-            #endregion
+            
 
             #region Tipo Operaciones
             services.AddScoped<IBusTipoOperaciones, BusTipoOperaciones>();

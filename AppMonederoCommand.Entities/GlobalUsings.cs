@@ -1,6 +1,5 @@
 ﻿global using AppMonederoCommand.Entities.Boletos.ResponseHTTP.EntResponseQR;
 global using AppMonederoCommand.Entities.Monedero;
-global using AppMonederoCommand.Entities.Pagos.Orden;
 global using AppMonederoCommand.Entities.TarjetaUsuario;
 global using IMD.Utils;
 global using Newtonsoft.Json;

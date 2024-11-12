@@ -75,10 +75,6 @@ public class DBMappingProfile : Profile
 
         CreateMap<EntMotivo, Motivo>().ReverseMap();
 
-        CreateMap<EntReplicaTicket, Ticket>();
-
-        CreateMap<Ticket, EntTicketResponse>();
-
         CreateMap<EntTipoOperaciones, TipoOperaciones>().ReverseMap();
     }
 

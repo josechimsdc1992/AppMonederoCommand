@@ -12,12 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Pagos\Banorte\" />
     <None Remove="Webhooks\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Pagos\Banorte\" />
-    <Folder Include="Webhooks\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Lenguajes\Menssages.Designer.cs">

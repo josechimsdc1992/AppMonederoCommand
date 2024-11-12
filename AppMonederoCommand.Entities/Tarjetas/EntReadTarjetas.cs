@@ -28,8 +28,8 @@ namespace AppMonederoCommand.Entities.Tarjetas
         [JsonProperty("idEstatusTarjeta")]
         public Guid? uIdEstatusTarjeta { get; set; }
 
-        /*[JsonProperty("TipoTarifa")]
-        public string? sTipoTarifa { get; set; }*/
+        //[JsonProperty("TipoTarifa")]
+        //public string? sTipoTarifa { get; set; }
 
         [JsonProperty("idTipoTarifa")]
         public Guid? uIdTipoTarifa { get; set; }
@@ -111,7 +111,7 @@ namespace AppMonederoCommand.Entities.Tarjetas
         public Guid? uIdDetalleSolicitud { get; set; }
         //public EntReadDetalleSolicitud? entDetalleSolicitud { get; set; }
         //public EntReadUsuariosTarjetas? entUsuarioTarjeta { get; set; }
-        //public EntReadTipoTarifas? entTipoTarifa { get; set; }
+        public EntReadTipoTarifas? entTipoTarifa { get; set; }
         public EntMotivo? entMotivos { get; set; }
         //public EntReadEstatusTarjeta? entEstatusTarjeta { get; set; }
         //public ICollection<EntReadComercioTarjetas>? lstComercioTarjetas { get; set; }

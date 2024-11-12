@@ -16,6 +16,7 @@ namespace AppMonederoCommand.Entities.Config
        
         public string MonederoC_Host { get; set; }
         public string MonederoC_Abonar { get; set; }
+        public string MonederoC_Traspaso { get; set; }
 
     }
 }

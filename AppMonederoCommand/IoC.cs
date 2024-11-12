@@ -1,4 +1,6 @@
-﻿namespace AppMonederoCommand.Api
+﻿using AppMonederoCommand.Data.Queries.Tarjetas;
+
+namespace AppMonederoCommand.Api
 {
     public static class IoC
     {
@@ -22,6 +24,9 @@
             #region Monedero
             services.AddScoped<IBusMonedero, BusMonedero>();
             services.AddScoped<IDatMonedero, DatMonedero>();
+
+            services.AddScoped<IDatTarjetas, DatTarjetas>();
+            services.AddScoped<IBusTarjetas, BusTarjeta>();
             #endregion
 
             #region Tarjetas

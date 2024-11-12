@@ -77,7 +77,8 @@ namespace AppMonederoCommand.Entities.Config
                 Seguridad_UserName = Environment.GetEnvironmentVariable("SYSTEM-USER-NAME") ?? "",
                 Seguridad_Password = Environment.GetEnvironmentVariable("SYSTEM-USER-PASSWORD") ?? "",
                 MonederoC_Host = IMDURL.NormalizeURL(Environment.GetEnvironmentVariable("MONEDEROC_URL") ?? ""),
-                MonederoC_Abonar = "abonar"
+                MonederoC_Abonar = "abonar",
+                MonederoC_Traspaso= "traspaso-saldo"
             };
 
             SERVICES.Seguridad_UserName = IMDSecurity.BDecrypt(SERVICES.Seguridad_UserName, PCKEY, PCIV);

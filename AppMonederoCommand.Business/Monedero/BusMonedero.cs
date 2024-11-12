@@ -512,21 +512,19 @@ public class BusMonedero : IBusMonedero
                 int numeroTarjetaOrigen = 0;
                 int.TryParse(entTransferir.sNumeroTarjetaOrigen, out numeroTarjetaOrigen);
 
-                int numeroTarjetaDestino = 0;
-                int.TryParse(entTransferir.sNumeroTarjetaDestino, out numeroTarjetaDestino);
-
                 IMDResponse<EntReadTarjetas> resTarjetaOrigen =await _busTarjetas.BGetByNumTarjeta(numeroTarjetaOrigen);
-                IMDResponse<EntReadTarjetas> resTarjetaDestino = await _busTarjetas.BGetByNumTarjeta(numeroTarjetaDestino);
+                
                 if (!resTarjetaOrigen.HasError)
                 {
-                    
+                    iTipoTarjetaOrigen = resTarjetaOrigen.Result.entTipoTarifa.tipoTarjeta;
                 }
+                
 
-                var infoTarjeta = await BGetDatosByNumTarjeta(entTransferir.sNumeroTarjetaOrigen, token);
-                if (infoTarjeta != null && !infoTarjeta.HasError)
-                {
-                    iTipoTarjetaOrigen = infoTarjeta.Result.iTipoTarjeta;
-                }
+                //var infoTarjeta = await BGetDatosByNumTarjeta(entTransferir.sNumeroTarjetaOrigen, token);
+                //if (infoTarjeta != null && !infoTarjeta.HasError)
+                //{
+                //    iTipoTarjetaOrigen = infoTarjeta.Result.iTipoTarjeta;
+                //}
                 var estatusTarjeta = await BValidaEstatusTarjeta(entTransferir.sNumeroTarjetaOrigen, token, iTipoTarjetaOrigen);
                 string mensajeTarjetaOrigen = Menssages.BusCardOrigin;
                 if (estatusTarjeta.HasError == true)
@@ -576,11 +574,16 @@ public class BusMonedero : IBusMonedero
 
             if (!string.IsNullOrEmpty(entTransferir.sNumeroTarjetaDestino))
             {
-                var infoTarjeta = await BGetDatosByNumTarjeta(entTransferir.sNumeroTarjetaDestino, token);
-                if (infoTarjeta != null && !infoTarjeta.HasError)
+                int numeroTarjetaDestino = 0;
+                int.TryParse(entTransferir.sNumeroTarjetaDestino, out numeroTarjetaDestino);
+
+                IMDResponse<EntReadTarjetas> resTarjetaDestino = await _busTarjetas.BGetByNumTarjeta(numeroTarjetaDestino);
+
+                if (!resTarjetaDestino.HasError)
                 {
-                    iTipoTarjetaDestino = infoTarjeta.Result.iTipoTarjeta;
+                    iTipoTarjetaDestino = resTarjetaDestino.Result.entTipoTarifa.tipoTarjeta;
                 }
+
                 var estatusTarjeta = await BValidaEstatusTarjeta(entTransferir.sNumeroTarjetaDestino, token, iTipoTarjetaDestino);
 
                 string mensajeTarjetaDestino = Menssages.BusCardDestiny;
@@ -754,19 +757,11 @@ public class BusMonedero : IBusMonedero
             string s = JsonConvert.SerializeObject(body);
 
             HttpClient httpClient = new HttpClient();
-            string ruta = "traspaso-saldo";
 
-            var httpResponse = await _servGenerico.SPostBody(_iMDServiceConfig.MonederoC_Host, ruta, body, token);
+            var httpResponse = await _servGenerico.SPostBody(_iMDServiceConfig.MonederoC_Host, _iMDServiceConfig.MonederoC_Traspaso, body, token);
 
             if (httpResponse.HasError != true)
             {
-                var origenSaldo = await MonederoSaldo(entTransferir.uIdMonederoOrigen, token);
-                response = await _datTarjetas.DUpdateSaldo(entTransferir.uIdMonederoOrigen, origenSaldo);
-
-                var destinoSaldo = await MonederoSaldo(entTransferir.uIdMonederoDestino, token);
-                response = await _datTarjetas.DUpdateSaldo(entTransferir.uIdMonederoDestino, destinoSaldo);
-
-
                 if (errorCodeEstatus != 0)
                 {
                     response.ErrorCode = errorCodeEstatus;

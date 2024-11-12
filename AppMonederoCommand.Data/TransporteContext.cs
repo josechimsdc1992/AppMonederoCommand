@@ -1,3 +1,5 @@
+using AppMonederoCommand.Data.Entities.Tarjeta;
+
 namespace AppMonederoCommand.Data;
 
 public partial class TransporteContext : DbContext
@@ -37,6 +39,7 @@ public partial class TransporteContext : DbContext
     public virtual DbSet<Motivo> Motivo { get; set; }
     public virtual DbSet<Ticket> Ticket { get; set; }
     public virtual DbSet<TipoOperaciones> TipoOperaciones { get; set; }
+    public virtual DbSet<EntTarjetas> Tarjetas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

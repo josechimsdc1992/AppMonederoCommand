@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-internal-service
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "transporte_cluster_prod-subnet-srv"
+    service.beta.kubernetes.io/azure-load-balancer-ipv4: 10.75.15.4
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: app-service

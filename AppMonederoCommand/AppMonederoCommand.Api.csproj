@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>1.0.4.1</Version>
+	<InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+  <ItemGroup>
+    <PackageReference Include="IMD.Utils" Version="1.0.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AppMonederoCommand.Business\AppMonederoCommand.Business.csproj" />
+    <ProjectReference Include="..\AppMonederoCommand.Data\AppMonederoCommand.Data.csproj" />
+    <ProjectReference Include="..\AppMonederoCommand.Business\AppMonederoCommand.Business.csproj" />
+    <ProjectReference Include="..\AppMonederoCommand.Data\AppMonederoCommand.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Middleware\" />
+    <None Remove="Authorization\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Middleware\" />
+    <Folder Include="Authorization\" />
+  </ItemGroup>
+</Project>

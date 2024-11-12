@@ -1,0 +1,175 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-service
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: app-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: app-service
+    spec:
+      containers:
+        - name: app-service
+          image: transporteregistrypro.azurecr.io/transporte/app-service:production
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: microservices-configmap
+            - configMapRef:
+                name: common-env
+          env:
+            - name: SERVICE_NAME
+              value: "App Service"
+
+            - name: NOTIFICATIONS_QUEUE
+              value: notifications-queue
+
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: username
+
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: password
+
+            - name: RABBITMQ_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: host
+
+            - name: RABBITMQ_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: port
+
+            - name: RABBITMQ_EXCHANGE
+              valueFrom:
+                secretKeyRef:
+                  name: env-config
+                  key: exchange
+
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: db-connection-encrypt
+                  key: app_service
+
+            - name: PCKEY
+              valueFrom:
+                secretKeyRef:
+                  name: imd-keys
+                  key: key
+
+            - name: PCIV
+              valueFrom:
+                secretKeyRef:
+                  name: imd-keys
+                  key: iv
+
+            - name: NOTIFICACION_URL
+              value: http://notificacion-service/historial/
+
+            - name: URLBASE_PAQUETES
+              value: http://catalogos-service
+
+            - name: ENDPOINT_GET_PAQUETES_APP
+              value: Paquetes/Productos
+
+            - name: URLBASE_AUTHENTICATION
+              value: http://seguridad-service
+
+            - name: ENDPOINT_AUTHENTICATION
+              value: auth/login
+
+            - name: URLBASE_PAGOS
+              value: http://pagos-command-service
+
+            - name: ENDPOINT_CONFIG_PAGOS
+              value: parametros-obtenerConfiguracion
+
+            - name: ENDPOINT_CREATE_ORDER
+              value: Ordenes/crear
+
+            - name: ENDPOINT_GET_ORDER_BY_KEY
+              value: Ordenes/obtener
+
+            - name: ENDPOINT_GET_ORDER_BY_REF
+              value: Ordenes/obtener/referencia
+
+            - name: ENDPOINT_UPDATE_ORDER
+              value: Ordenes/actualizar
+
+            - name: ENDPOINT_SAVE_PAYMENT_PAYPAL
+              value: Pagos/paypal
+
+            - name: ENDPOINT_SAVE_PAYMENT_MERCADOPAGO
+              value: Pagos/mercadopago
+
+            - name: MONEDEROQ_URL
+              value: http://monederoq-service
+
+            - name: MONEDEROC_URL
+              value: http://monederoc-service
+
+            - name: TARJETA_URL
+              value: http://credencializacion-service
+
+            - name: AZUREBLOBSTORAGE_KEY
+              value: DefaultEndpointsProtocol=https;AccountName=apptransporteyucatanqa;AccountKey=zih641/DpjSAHeGetpIJm+VfbUi0rIzbUtrdv0HA0tdHgzyL05LK6L6FJ25QCjAiJ5ef6PSkJTBu+AStwl/AAw==;EndpointSuffix=core.windows.net
+
+            - name: TICKETS_URL
+              value: http://tickets-service
+
+            - name: ENDPOINT_SAVE_PAYMENT_BANORTE
+              value: Pagos/banorte
+
+            - name: ENDPOINT_SAVE_PAYMENT_CODI
+              value: Pagos/codi
+
+            - name: URLBASE_PAGOS_QUERYS
+              value: http://pagos-querys-service
+
+            - name: ENDPOINT_GET_ORDENES_BY_LIST
+              value: Ordenes/obtener/list
+
+            - name: ENDPOINT_GET_TIPOTARIFAS
+              value: TipoTarifas/App?IdTarifas={idTarifas}
+
+            - name: USE_OCI_CONECTION
+              value: "1"
+
+            - name: APP_API_KEY
+              value: "appService_A8UF7lYs9U7TmTzOV5UA8e2bNUD6w9WPVhdSxdgDve6eiLdWhcraV"
+
+            - name: ENDPOINT_GET_GENEROS
+              value: "Generos/list"
+
+            - name: ERROR_CODE_SESION
+              value: "412"
+
+            - name: NOTIFICATION_SERVICE_ENABLE
+              value: "0"
+
+          volumeMounts: # Directorio de los archivos OCI
+            - name: azurefileshare
+              mountPath: /AppService/WalletOCI
+
+      volumes:
+        - name: azurefileshare
+          azureFile: # Origen de los archivos OCI
+            secretName: storage-secret
+            shareName: adb-k8s
+            readOnly: true

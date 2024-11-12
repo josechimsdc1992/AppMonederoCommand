@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="32.0.3" />
+    <PackageReference Include="IMD.Utils" Version="1.0.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Pagos\Banorte\" />
+    <None Remove="Webhooks\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pagos\Banorte\" />
+    <Folder Include="Webhooks\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Lenguajes\Menssages.Designer.cs">
+      <DependentUpon>Menssages.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Lenguajes\Menssages.es.Designer.cs">
+      <DependentUpon>Menssages.es.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Lenguajes\Menssages.es.resx">
+      <LastGenOutput>Menssages.es.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Lenguajes\Menssages.resx">
+      <LastGenOutput>Menssages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

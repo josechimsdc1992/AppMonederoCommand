@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:63546",
+      "sslPort": 44336
+    }
+  },
+  "IIS Express": {
+    "commandName": "IISExpress",
+    "launchBrowser": true,
+    "launchUrl": "swagger",
+    "environmentVaVariables": {
+      "ASPNETCORE_ENVIRONMENT": "Development"
+    }
+  },
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5109",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true
+    },
+    "https": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7081;http://localhost:5109",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DB_CONNECTION_STRING": "sx2OgGWthvot8Yqgq9ZNY63OYXPEvO/bbiZKl5bDodqFHsJr23LUa9S1SDaLH4wBCp4yAVjwNbPIpEuNAkfjYilVVbraFu82tWZc3MCRXsyXrjZNlvconBFM9pat2ugJW83QufQx2Y0MljrhTNFGLYMcGTDIguTdnkeiwUGBC7I+Puoo/N0OV/9g9d6SCJLSoN8roNGCjOTuGekJBc52NT9ojWSMGTS8OFpy68Y+Yka/WduOKKBlGx1VqLKU9q+gzJns6KJfSiFx1SHcoVyTlw==",
+        "PCKEY": "9gug89RF0vtEpca7",
+        "PCIV": "BbTXA43B",
+        "SERVICE_NAME": "App Service",
+        "RABBITMQ_HOST": "rabbitmq.qa-transporte.mrptechnology.mx",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USERNAME": "user_imd",
+        "RABBITMQ_PASSWORD": "M57WN35mSTEVVB#N",
+        "RABBITMQ_EXCHANGE": "Transporte.Dev",
+        "NOTIFICACION_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/notificacion/historial/",
+        "URLBASE_PAQUETES": "https://api.qa-transporte.mrptechnology.mx/api/v1/catalogos",
+        "ENDPOINT_GET_PAQUETES_APP": "Paquetes/Productos",
+        "URLBASE_AUTHENTICATION": "https://api.qa-transporte.mrptechnology.mx",
+        "ENDPOINT_AUTHENTICATION": "api/v1/auth/login",
+        "SYSTEM-USER-NAME": "yerMEPMWHoBtD6CkqLCwPw==",
+        "SYSTEM-USER-PASSWORD": "NLuWZU8+B5Xj7Q9DKhl19A==",
+        "URLBASE_PAGOS": "https://api.qa-transporte.mrptechnology.mx/api/v1/pagos-command",
+        "ENDPOINT_CONFIG_PAGOS": "parametros-obtenerConfiguracion",
+        "ENDPOINT_CREATE_ORDER": "Ordenes/crear",
+        "ENDPOINT_GET_ORDER_BY_KEY": "Ordenes/obtener",
+        "ENDPOINT_GET_ORDER_BY_REF": "Ordenes/obtener/referencia",
+        "ENDPOINT_UPDATE_ORDER": "Ordenes/actualizar",
+        "ENDPOINT_SAVE_PAYMENT_PAYPAL": "Pagos/paypal",
+        "ENDPOINT_SAVE_PAYMENT_MERCADOPAGO": "Pagos/mercadopago",
+        "ENDPOINT_SAVE_PAYMENT_BANORTE": "Pagos/banorte",
+        "ENDPOINT_SAVE_PAYMENT_CODI": "Pagos/codi",
+        "MONEDEROQ_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/monederoq",
+        "MONEDEROC_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/monederoc",
+        "TARJETA_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/credencializacion",
+        "AZUREBLOBSTORAGE_KEY": "DefaultEndpointsProtocol=https;AccountName=apptransporteyucatanqa;AccountKey=zih641/DpjSAHeGetpIJm+VfbUi0rIzbUtrdv0HA0tdHgzyL05LK6L6FJ25QCjAiJ5ef6PSkJTBu+AStwl/AAw==;EndpointSuffix=core.windows.net",
+        "TICKETS_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/tickets",
+        "URLBASE_PAGOS_QUERYS": "https://api.qa-transporte.mrptechnology.mx/api/v1/pagos-querys",
+        "ENDPOINT_GET_ORDENES_BY_LIST": "Ordenes/obtener/list",
+        "ENDPOINT_GET_TIPOTARIFAS": "TipoTarifas/App?IdTarifas={idTarifas}",
+        "USE_OCI_CONECTION": "0",
+        "APP_API_KEY": "AppMonederoCommand_A8UF7lYs9U7TmTzOV5UA8e2bNUD6w9WPVhdSxdgDve6eiLdWhcraV",
+        "ENDPOINT_GET_GENEROS": "Generos/list",
+        "ERROR_CODE_SESION": "412",
+        "NOTIFICATION_SERVICE_ENABLE": "0"
+      }
+    }
+  }
+}

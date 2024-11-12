@@ -20,10 +20,7 @@ public class BusMonedero : IBusMonedero
     private readonly ILogger<BusMonedero> _logger;
     private readonly IServGenerico _servGenerico;
     private readonly IDatTarjetaUsuario _datTarjetas;
-    private readonly string _urlTarjeta = Environment.GetEnvironmentVariable("TARJETA_URL") ?? "";
     private readonly IDatFolio _datFolio;
-    private readonly string _urlMonederoQ = Environment.GetEnvironmentVariable("MONEDEROQ_URL") ?? "";
-    private readonly string _urlCatalogo = Environment.GetEnvironmentVariable("URLBASE_PAQUETES") ?? "";
     private readonly IBusParametros _busParametros;
     private readonly IMDRabbitNotifications _notificationsServiceIMD;
     private readonly ExchangeConfig _exchangeConfig;
@@ -32,7 +29,6 @@ public class BusMonedero : IBusMonedero
     private readonly IBusTipoTarifa _busTipoTarifa;
     private readonly IBusTipoOperaciones _busTipoOperaciones;
     private readonly IDatUsuario _datUsuario;
-    private readonly string _errorCodeSesion = Environment.GetEnvironmentVariable("ERROR_CODE_SESION") ?? "";
     private readonly IMDServiceConfig _iMDServiceConfig;
     private readonly IMDParametroConfig _IMDParametroConfig;
     private readonly IBusTarjetas _busTarjetas;
@@ -87,7 +83,7 @@ public class BusMonedero : IBusMonedero
                             response.SetError(Menssages.BusLoginOtherDevice);
                             response.Result = new EntSaldo();
                             response.HttpCode = HttpStatusCode.PreconditionFailed;
-                            response.ErrorCode = int.Parse(_errorCodeSesion);
+                            response.ErrorCode = int.Parse(_IMDParametroConfig._errorCodeSesion);
                             return response;
                         }
                         if (entUsuarios.Result.iEstatusCuenta == (int)eEstatusCuenta.REPORTADO)
@@ -95,7 +91,7 @@ public class BusMonedero : IBusMonedero
                             response.SetError(Menssages.BusBlockedAccountApp);
                             response.Result = new EntSaldo();
                             response.HttpCode = HttpStatusCode.PreconditionFailed;
-                            response.ErrorCode = int.Parse(_errorCodeSesion);
+                            response.ErrorCode = int.Parse(_IMDParametroConfig._errorCodeSesion);
                             return response;
                         }
                     }
@@ -201,9 +197,8 @@ public class BusMonedero : IBusMonedero
                     Guid idUsuario = uIdUsuario != null ? Guid.Parse(uIdUsuario.ToString()) : Guid.NewGuid();
 
                     //Obtener las tarifas...
-                    var tarifas = await BGetTipoTarias(token);
-                    if (!tarifas.HasError)
-                    {
+                    List<EntReplicaTipoTarifas> tipoTarifas = _IMDParametroConfig.TipoTarifas;
+                    
                         var tarjetas = await _datTarjetas.DTarjetas(idUsuario);
                         if (!tarjetas.HasError)
                         {
@@ -212,12 +207,12 @@ public class BusMonedero : IBusMonedero
                             entSaldo.uIdTipoTarifa = httpResponseMonedero.Result.idTipoTarifa;
 
                             var tarjeta = tarjetas.Result.Where(w => w.sNumeroTarjeta == NumeroTarjeta).FirstOrDefault();
-                            var tipoTarifa = tarifas.Result.tipostarifa.Where(w => w.idTipoTarifa == tarjeta.uIdTipoTarifa.ToString()).FirstOrDefault();
+                            var tipoTarifa = tipoTarifas.Where(w => w.uIdTipoTarifa == tarjeta.uIdTipoTarifa).FirstOrDefault();
 
                             if (tipoTarifa != null && tarjeta != null)
                             {
-                                entSaldo.sTipoTarifa = tipoTarifa.nombreTarifa;
-                                entSaldo.iTipoTarjeta = tipoTarifa.tipoTarjeta;
+                                entSaldo.sTipoTarifa = tipoTarifa.sTipoTarifa;
+                                entSaldo.iTipoTarjeta = tipoTarifa.iTipoTarjeta;
                             }
                             else
                             {
@@ -245,13 +240,7 @@ public class BusMonedero : IBusMonedero
                             response.ErrorCode = tarjetas.ErrorCode;
                             response.SetError(tarjetas.Message);
                         }
-                    }
-                    else
-                    {
-
-                        response.ErrorCode = tarifas.ErrorCode;
-                        response.SetError(tarifas.Message);
-                    }
+                    
                 }
             }
             else
@@ -266,212 +255,6 @@ public class BusMonedero : IBusMonedero
             response.SetError(ex);
 
             _logger.LogError(IMDSerializer.Serialize(67823464094932, $"Error en {metodo}(Guid uIdMonedero, string token, string? NumeroTarjeta): {ex.Message}", uIdMonedero, token, NumeroTarjeta, ex, response));
-        }
-        return response;
-    }
-
-    public async Task<IMDResponse<EntMovimientos>> BConsultarMovimiento(Guid uIdMonedero, string FechaInicial, string FechaFinal, int numPagReq, int numRegReq, string token, string? NumeroTarjeta)
-    {
-        IMDResponse<EntMovimientos> response = new IMDResponse<EntMovimientos>();
-
-        string metodo = nameof(this.BConsultarMovimiento);
-        _logger.LogInformation(IMDSerializer.Serialize(67823464095709, $"Inicia {metodo}(Guid uIdMonedero, string FechaInicial, string FechaFinal, int numPagReq, int numRegReq, string token, string? NumeroTarjeta)", uIdMonedero, FechaInicial, FechaFinal, numPagReq, numRegReq, token, NumeroTarjeta));
-
-        try
-        {
-            //Valida tarjeta
-            if (!string.IsNullOrEmpty(NumeroTarjeta))
-            {
-                var estatusTarjeta = await BValidaEstatusTarjeta(NumeroTarjeta, token);
-                if (estatusTarjeta.HasError == true)
-                {
-                    response.ErrorCode = estatusTarjeta.ErrorCode;
-                    string message = Menssages.BusCard;
-                    if (estatusTarjeta.ErrorCode == EntConfiguracionEstatusTarjeta.iErrorCodeInformacion)
-                    {
-                        message = message + estatusTarjeta.Message;
-                    }
-                    else
-                    {
-                        message = message + estatusTarjeta.Message;
-                    }
-                    response.SetError(message);
-                    return response;
-                }
-            }
-            //Termina valida tarjeta
-            //Valida que estatus tiene el monedero
-            var estatusMonedero = await BEstatusMonedero(uIdMonedero);
-            if (estatusMonedero.HasError == true)
-            {
-                response.ErrorCode = estatusMonedero.ErrorCode;
-                string message = Menssages.BusMonedero;
-                if (estatusMonedero.ErrorCode == EntConfiguracionEstatusMonedero.iErrorCodeInformacion)
-                {
-                    message = message + estatusMonedero.Message;
-                }
-                else
-                {
-                    message = message + estatusMonedero.Message;
-                }
-                response.SetError(message);
-                return response;
-            }
-
-            //Termina validación del estatus del monedero
-            var body = new
-            {
-                idMonedero = uIdMonedero,
-                numPag = numPagReq,
-                numReg = numRegReq,
-                fechaInicial = DateTime.ParseExact(FechaInicial, "dd/MM/yyyy", CultureInfo.InvariantCulture),
-                fechaFinal = DateTime.ParseExact(FechaFinal, "dd/MM/yyyy", CultureInfo.InvariantCulture)
-            };
-
-            HttpClient httpClient = new HttpClient();
-            string ruta = "movimiento";
-
-            var httpResponse = await _servGenerico.SPostBody(_urlMonederoQ, ruta, body, token);
-
-            List<EntTipoOperaciones> entTipoOperaciones = null;
-            try { entTipoOperaciones = _busTipoOperaciones.BObtenerTipoOperaciones().Result.Result; } catch (Exception e) { }
-
-
-            if (httpResponse.HasError != true)
-            {
-                var responseObject = JsonConvert.DeserializeObject<EntPagination<Movimiento>>(JsonConvert.SerializeObject(httpResponse.Result));
-                var res = responseObject?.Datos;
-
-                if (res == null || responseObject == null)
-                {
-
-                    var entPaginacion = new EntPaginacion
-                    {
-                        iNumPag = numPagReq,
-                        iNumReg = numRegReq
-                    };
-
-                    var emptyMovimientos = new EntMovimientos
-                    {
-                        Operaciones = new List<Operaciones>(),
-                        Paginacion = entPaginacion
-                    };
-
-                    response.SetSuccess(emptyMovimientos, Menssages.BusCompleteCorrect);
-                    return response;
-                }
-
-                string serie = _busParametros.BObtener("APP_SERIE").Result.Result.sValor ?? "";
-
-                //Obtener los datos del monedero...
-                EntReadTipoTarifas entReadTipoTarifa = null;
-                var datosMonedero = BDatosMonedero(uIdMonedero).Result;
-                if (!datosMonedero.HasError)
-                {
-                    var tipoTarifa = await BTipoTarifa(datosMonedero.Result.idTipoTarifa);
-                    if (tipoTarifa.HasError)
-                    {
-                        response.SetError(Menssages.BusNoTypeTarifaForMoney);
-                        return response;
-                    }
-                    else
-                    {
-                        entReadTipoTarifa = tipoTarifa.Result;
-                    }
-
-                }
-                else
-                {
-                    response.SetError(Menssages.BusNoDatsMoney);
-                    return response;
-                }
-
-                //Obtener las ordenes...
-                List<EntOrden> listaOrdenes = new List<EntOrden>();
-                var listaIdsOrdenes = res.Where(w => w.TipoMovimiento == TipoMovimientos.ABONO.GetDescription()).Select(item => item.IdOperacion).ToList();
-                if (listaIdsOrdenes.Count > 0)
-                {
-                    try
-                    {
-                        listaOrdenes = BObtenerByListOrdenes(listaIdsOrdenes, token).Result.Result;
-                        if (listaOrdenes == null)
-                        {
-                            listaOrdenes = new List<EntOrden>();
-                        }
-                    }
-                    catch
-                    {
-                        listaOrdenes = new List<EntOrden>();
-                    }
-                }
-
-                List<Operaciones> operaciones = new List<Operaciones>();
-                res.ToList().ForEach(item =>
-                {
-                    string sTipoOperacion = item.Operacion;
-                    if(entTipoOperaciones != null)
-                    {
-                        var tipo = entTipoOperaciones.Where(x => x.uIdTipoOperacion == item.IdTipoOperacion).FirstOrDefault();
-                        if(tipo != null)
-                            sTipoOperacion = tipo.sNombre;
-                    }
-                    var _operacion = new Operaciones
-                    {
-                        uIdOperacion = serie + "-" + item.folioMovimiento,
-                        sOperacion = sTipoOperacion,
-                        sTipoMovimiento = item.TipoMovimiento,
-                        dImporteGeneral = item.Monto,
-                        iNumeroMonedero = item.NumeroMonedero.ToString(),
-                        iTipoTarjeta = entReadTipoTarifa.tipoTarjeta,
-                        sNombreTarifa = entReadTipoTarifa.nombreTarifa
-                    };
-
-                    var orden = listaOrdenes.Where(w => w.IdOrden == item.IdOperacion).FirstOrDefault();
-                    if (orden != null)
-                    {
-                        _operacion.sConcepto = orden.Concepto;
-                        _operacion.dImporte = orden.Detalle.Sum(s => s.Monto);
-                        _operacion.dtFechaOperacion = item.FechaOperacion.ToString("yyyy-MM-ddTHH:mm:ss.fffff");
-                        _operacion.BIsVentaSaldo = true;
-                    }
-                    else
-                    {
-                        _operacion.sConcepto = BObtenerConcepto(item.Operacion, item.TipoMovimiento, -1, item.NumeroMonedero.ToString(), out bool isVentaSaldo);
-                        _operacion.dImporte = item.Monto;
-                        _operacion.dtFechaOperacion = item.FechaOperacion.ToString("yyyy-MM-ddTHH:mm:ss.fffff");
-                        _operacion.BIsVentaSaldo = isVentaSaldo;
-                    }
-
-                    operaciones.Add(_operacion);
-                });
-
-                var paginacion = new EntPaginacion
-                {
-                    iNumPag = responseObject.iPagina,
-                    iNumReg = responseObject.iNumeroRegistros
-                };
-
-                var respuesta = new EntMovimientos
-                {
-                    Operaciones = operaciones.OrderByDescending(ord => ord.dtFechaOperacion).ToList(),
-                    Paginacion = paginacion
-                };
-
-                response.SetSuccess(respuesta);
-
-            }
-            else
-            {
-                response.ErrorCode = httpResponse.ErrorCode;
-                response.SetError(httpResponse.Message);
-            }
-        }
-        catch (Exception ex)
-        {
-            response.ErrorCode = 67823464096486;
-            response.SetError(ex);
-
-            _logger.LogError(IMDSerializer.Serialize(67823464096486, $"Error en {metodo}(Guid uIdMonedero, string FechaInicial, string FechaFinal, int numPagReq, int numRegReq, string token, string? NumeroTarjeta): {ex.Message}", uIdMonedero, FechaInicial, FechaFinal, numPagReq, numRegReq, token, NumeroTarjeta, ex, response));
         }
         return response;
     }
@@ -977,36 +760,6 @@ public class BusMonedero : IBusMonedero
             _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(EntAbonar entAbonar, string token): {ex.Message}", entAbonar, token, ex, response));
         }
         return (response, response02); ;
-    }
-
-    public async Task<decimal> MonederoSaldo(Guid uIdMonedero, string token)
-    {
-        var body = new
-        {
-            idMonedero = uIdMonedero,
-            numPag = 1,
-            numReg = 1
-        };
-
-        HttpClient httpClient = new HttpClient();
-        string ruta = "vista-monedero";
-
-        var httpResponseMonedero = await _servGenerico.SPostBody(_urlMonederoQ, ruta, body, token);
-
-        if (httpResponseMonedero.HasError != true)
-        {
-            var responseObject = JsonConvert.DeserializeObject<EntPagination<EntMonederoRes>>(JsonConvert.SerializeObject(httpResponseMonedero.Result));
-            var res = responseObject?.Datos?.FirstOrDefault();
-
-            if (res == null || responseObject == null)
-            {
-                return 0;
-            }
-
-            return res.saldo;
-        }
-
-        return 0;
     }
 
     public async Task<IMDResponse<dynamic>> BActualizaMonedero(EntRequestHTTPActualizaMonedero reqActualizaMonedero, string token)
@@ -1750,203 +1503,6 @@ public class BusMonedero : IBusMonedero
         }
 
         return sConcepto;
-    }
-
-    [IMDMetodo(67823464736734, 67823464735957)]
-    private async Task<IMDResponse<EntListTipoTarifas>> BGetTipoTarias(string token)
-    {
-        IMDResponse<EntListTipoTarifas> response = new IMDResponse<EntListTipoTarifas>();
-        IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
-        _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo}(string token)", token));
-
-        try
-        {
-            var ruta = "TipoTarifas/list";
-            var httpResponseCatalogo = await _servGenerico.SGetPath(_urlCatalogo, ruta, token);
-
-            if (httpResponseCatalogo.HasError != true)
-            {
-                string s = httpResponseCatalogo.Result.ToString();
-                var obj = JsonConvert.DeserializeObject<EntListTipoTarifas>(httpResponseCatalogo.Result.ToString());
-
-                if (obj == null)
-                {
-                    response.SetError("Sin respuesta exitosa del catalogo de Tipo Tarifa.");
-                    return response;
-                }
-                else
-                {
-                    response.SetSuccess(obj);
-                }
-            }
-            else
-            {
-                response.ErrorCode = httpResponseCatalogo.ErrorCode;
-                response.SetError(httpResponseCatalogo.Message);
-            }
-        }
-        catch (Exception ex)
-        {
-            response.ErrorCode = metodo.iCodigoError;
-            response.SetError(ex);
-            _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(string token): {ex.Message}", token, ex, response));
-        }
-        return response;
-    }
-
-    [IMDMetodo(67823465372320, 67823465371543)]
-    public async Task<IMDResponse<EntDatosTarjeta>> BGetDatosByNumMonedero(string sNumMonedero, string token)
-    {
-        IMDResponse<EntDatosTarjeta> response = new IMDResponse<EntDatosTarjeta>();
-        IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
-        _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo}(string sNumMonedero, string token)", sNumMonedero, token));
-
-        try
-        {
-            var ruta = "vista-monedero";
-
-            dynamic body = new ExpandoObject();
-            body.numPag = 1;
-            body.numReg = 10;
-            body.numMonedero = sNumMonedero;
-
-            var httpResponse = await _servGenerico.SPostBody(_urlMonederoQ, ruta, body, token);
-
-            if (httpResponse.HasError != true)
-            {
-                string s = httpResponse.Result.ToString();
-                dynamic json = JObject.Parse(s);
-
-                if (json != null)
-                {
-                    if (json["datos"].Count > 0)
-                    {
-                        //Obtener la tarifa...
-                        int iTipoTarjeta = 0;
-                        var tarifa = await BTipoTarifa(Guid.Parse(json["datos"][0].idTipoTarifa.ToString()));
-                        if (!tarifa.HasError)
-                        {
-                            iTipoTarjeta = tarifa.Result.tipoTarjeta;
-                        }
-
-                        var monedero = new EntDatosTarjeta
-                        {
-                            uIdMonedero = json["datos"][0].idMonedero,
-                            NumeroTarjeta = json["datos"][0].numMonedero,
-                            dSaldo = json["datos"][0].saldo,
-                            iTipoTarjeta = iTipoTarjeta,
-                            sEstatus = json["datos"][0].estatus
-                        };
-
-                        response.SetSuccess(monedero);
-                    }
-                    else
-                    {
-                        response.SetError("Sin respuesta exitosa del catalogo de monederos.");
-                        return response;
-                    }
-                }
-                else
-                {
-                    response.SetError("Sin respuesta exitosa del catalogo de monederos.");
-                    return response;
-                }
-            }
-            else
-            {
-                response.ErrorCode = httpResponse.ErrorCode;
-                response.SetError(httpResponse.Message);
-            }
-        }
-        catch (Exception ex)
-        {
-            response.ErrorCode = metodo.iCodigoError;
-            response.SetError(ex);
-            _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(string sNumMonedero, string token): {ex.Message}", sNumMonedero, token, ex, response));
-        }
-        return response;
-    }
-
-    [IMDMetodo(67823456478246, 67823462478133)]
-    public async Task<IMDResponse<EntDatosTarjeta>> BGetDatosByNumTarjeta(string sNumeroTarjeta, string token)
-    {
-        IMDResponse<EntDatosTarjeta> response = new IMDResponse<EntDatosTarjeta>();
-        IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
-        _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo}(string sNumeroTarjeta)", sNumeroTarjeta));
-
-        try
-        {
-            var ruta = "Tarjetas/All";
-
-            dynamic body = new ExpandoObject();
-            body.numPag = 1;
-            body.numReg = 10;
-            body.iNumeroTarjeta = sNumeroTarjeta;
-
-            var httpResponse = await _servGenerico.SPostBody(_urlTarjeta, ruta, body, token);
-
-            if (httpResponse.HasError != true)
-            {
-                string s = httpResponse.Result.ToString();
-                dynamic json = JObject.Parse(s);
-
-                if (json != null)
-                {
-                    if (json["datos"].Count > 0)
-                    {
-                        //Obtener el saldo de la tarjeta...
-                        decimal dSaldo = 0;
-                        var datosMonedero = await BDatosMonedero(Guid.Parse(json["datos"][0].IdMonedero.ToString()));
-                        if (!datosMonedero.HasError)
-                        {
-                            dSaldo = datosMonedero.Result.saldo;
-                        }
-
-                        //Obtener la tarifa...
-                        int iTipoTarjeta = 0;
-                        var tarifa = await BTipoTarifa(Guid.Parse(json["datos"][0].idTipoTarifa.ToString()));
-                        if (!tarifa.HasError)
-                        {
-                            iTipoTarjeta = tarifa.Result.tipoTarjeta;
-                        }
-
-                        var monedero = new EntDatosTarjeta
-                        {
-                            uIdMonedero = json["datos"][0].IdMonedero,
-                            NumeroTarjeta = json["datos"][0].NumeroTarjeta,
-                            dSaldo = dSaldo,
-                            iTipoTarjeta = iTipoTarjeta,
-                            sEstatus = datosMonedero.Result.estatus
-                        };
-
-                        response.SetSuccess(monedero);
-                    }
-                    else
-                    {
-                        response.SetError("Sin respuesta exitosa del catalogo de tarjetas.");
-                        return response;
-                    }
-                }
-                else
-                {
-                    response.SetError("Sin respuesta exitosa del catalogo de tarjetas.");
-                    return response;
-                }
-            }
-            else
-            {
-                response.ErrorCode = httpResponse.ErrorCode;
-                response.SetError(httpResponse.Message);
-            }
-        }
-        catch (Exception ex)
-        {
-            response.ErrorCode = metodo.iCodigoError;
-            response.SetError(ex);
-
-            _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(string sNumeroTarjeta): {ex.Message}", sNumeroTarjeta, ex, response));
-        }
-        return response;
     }
 
     [IMDMetodo(67823465941861, 67823465942638)]

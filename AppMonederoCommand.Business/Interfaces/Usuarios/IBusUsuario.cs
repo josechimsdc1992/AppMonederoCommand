@@ -56,10 +56,7 @@
         Task<IMDResponse<EntUsuario>> BGetByMonedero(Guid uIdMonedero, string? sIdAplicacion = null);
         Task<IMDResponse<EntUsuario>> BValidaMonederoUsuario(Guid uIdUsuario);
 
-        Task<IMDResponse<EntPagination<EntUsuarioApp>>> BGetUsuariosApp(EntFiltersUsuario pEntity, string sToken);
         Task<IMDResponse<dynamic>> BDescargaImagenUsuarioApp(Guid uIdUsuario);
-        Task<IMDResponse<CSVResponse>> BGetUsuariosAppCSV(EntFiltersUsuario pEntity, string sToken);
-        Task<IMDResponse<List<EntUsuarioAppInfo>>> BGetUsuariosAppInfo(Guid uIdUsuario);
         Task<IMDResponse<EntCodigoCuentaResponse>> BEnviarCodigoEliminacionCuenta(EntCodigoCuentaRequest entCodigoCuentaRequest);
         Task<IMDResponse<bool>> BConfirmarEliminacionCuenta(EntEliminaCuentaRequest entEliminaCuentaRequest);
         Task<IMDResponse<string>> BGeneraCodigoAlfanumerico(int iLength);

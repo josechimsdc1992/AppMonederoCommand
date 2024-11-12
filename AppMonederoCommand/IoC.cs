@@ -61,23 +61,12 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IBusPaquetes, BusPaquetes>();
             #endregion
 
-            #region Pagos
-            services.AddScoped<IBusConfiguracionPago, BusConfiguracionPago>();
-            services.AddScoped<IBusPayPal, BusPayPal>();
-            services.AddScoped<IBusMercadoPago, BusMercadoPago>();
-            services.AddScoped<IBusOrden, BusOrden>();
-            services.AddScoped<IBusBanorte, BusBanorte>();
-            services.AddScoped<IBusCodi, BusCodi>();
-            #endregion
 
             #region Boletos Service
             services.AddScoped<IBusBoleto, BusBoleto>();
             services.AddScoped<IDatHistorialBoletoVirtual, DatHistorialBoletoVirtual>();
             #endregion
 
-            #region Webhooks
-            services.AddScoped<IBusWebhooks, BusWebhooks>();
-            #endregion
 
             #region Folio
             services.AddScoped<IDatFolio, DatFolio>();

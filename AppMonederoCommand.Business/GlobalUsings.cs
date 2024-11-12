@@ -9,7 +9,6 @@ global using AppMonederoCommand.Business.Interfaces.Tarifa;
 global using AppMonederoCommand.Business.Interfaces.Tarjeta;
 global using AppMonederoCommand.Business.Interfaces.Tickets;
 global using AppMonederoCommand.Business.Interfaces.Usuarios;
-global using AppMonederoCommand.Business.Interfaces.Webhooks;
 global using AppMonederoCommand.Business.Properties;
 global using AppMonederoCommand.Business.Repositories;
 global using AppMonederoCommand.Business.Repositories.Boletos;

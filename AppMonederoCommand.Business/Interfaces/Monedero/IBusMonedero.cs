@@ -12,7 +12,6 @@
 public interface IBusMonedero
 {
     Task<IMDResponse<EntSaldo>> BGetSaldo(Guid uIdMonedero, string token, string? NumeroTarjeta, Guid? uIdUsuario, string? sIdAplicacion = null);
-    Task<IMDResponse<EntMovimientos>> BConsultarMovimiento(Guid uIdMonedero, string FechaInicial, string FechaFinal, int NumPag, int NumReg, string token, string? NumeroTarjeta);
     Task<(IMDResponse<bool>, IMDResponse<AbonarSaldo>)> BAbonar(EntAbonar entAbonar, string token);
     Task<(IMDResponse<bool>, IMDResponse<TraspasoSaldoRequestModel>)> BTransferirSaldo(EntTransferirSaldo entTransferirSaldo, string token);
     Task<IMDResponse<dynamic>> BActualizaMonedero(EntRequestHTTPActualizaMonedero reqActualizaMonedero, string token);
@@ -24,7 +23,6 @@ public interface IBusMonedero
     Task<IMDResponse<EntOperacionesPermitidasTarjeta>> BValidaEstatusTarjeta(string sNumeroTarjeta, string token, int? iTipoTarjeta = null);
     Task<IMDResponse<EntMonederoRes>> BDatosMonedero(Guid uIdMonedero);
     Task<IMDResponse<List<EntOrden>>> BObtenerByListOrdenes(List<Guid>? uIdsOrdenes, string token);
-    Task<IMDResponse<EntDatosTarjeta>> BGetDatosByNumMonedero(string sNumMonedero, string token);
     Task<IMDResponse<EntReadTipoTarifas>> BTipoTarifa(Guid uIdTipoTarifa);
     Task<IMDResponse<bool>> BMonederoCreacion(EntCreateReplicaMonederos entMonederoNotificacion);
     Task<IMDResponse<EntInfoMonedero>> BConsultarMonedero(Guid uIdMonedero);

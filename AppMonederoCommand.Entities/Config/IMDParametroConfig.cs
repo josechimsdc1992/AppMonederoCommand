@@ -17,6 +17,7 @@ namespace AppMonederoCommand.Entities.Config
         public string PARAMETRO_APP_TRANSFERIR_GUID { get; set; }
         public string PARAMETRO_APP_ABONAR_DESCRIPCION { get; set; }
         public string PARAMETRO_APP_ABONAR_GUID { get; set; }
+        public string _errorCodeSesion { get;set; }
         public List<EntTipoOperaciones> TipoOperaciones { get; set; }
         public List<EntReplicaTipoTarifas> TipoTarifas { get; set; }
     }

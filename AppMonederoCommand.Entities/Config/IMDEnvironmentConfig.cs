@@ -87,7 +87,11 @@ namespace AppMonederoCommand.Entities.Config
             PARAMETROS = new IMDParametroConfig
             {
                 Parametro_Error_Generico = Environment.GetEnvironmentVariable("PARAMETRO-ERROR-GENERICO") ?? ""
+
             };
+
+            string errorCode = Environment.GetEnvironmentVariable("ERROR_CODE_SESION");
+            PARAMETROS._errorCodeSesion = errorCode;
         }
 
         private void SetEnviroment()

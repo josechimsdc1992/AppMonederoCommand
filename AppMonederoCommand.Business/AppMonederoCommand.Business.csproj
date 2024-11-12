@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Pagos\Banorte\" />
-    <None Remove="Interfaces\Pagos\Banorte\" />
     <None Remove="Webhooks\" />
     <None Remove="Interfaces\Webhooks\" />
     <None Remove="Properties\" />
@@ -33,10 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pagos\Banorte\" />
-    <Folder Include="Interfaces\Pagos\Banorte\" />
-    <Folder Include="Webhooks\" />
-    <Folder Include="Interfaces\Webhooks\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

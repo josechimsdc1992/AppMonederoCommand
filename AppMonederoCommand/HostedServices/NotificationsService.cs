@@ -9,12 +9,15 @@ namespace AppMonederoCommand.Api.HostedServices
         private readonly string ServiceName = Environment.GetEnvironmentVariable("SERVICE_NAME") ?? "SERVICE";
         private readonly string _NotificationService = Environment.GetEnvironmentVariable("NOTIFICATION_SERVICE_ENABLE") ?? "0";
         private IBusParametros _busParametros;
+        private IBusTarjetas _busTarjetas;
         private IServiceProvider _serviceProvider;
         public bool IsConnected { get; internal set; }
         private bool hasSubscribed = false;
         public bool IsEnabled { get; internal set; }
 
-        public NotificationsService(ILogger<NotificationsService> logger, IMDRabbitNotifications rabbitNotifications, ExchangeConfig exchangeConfig, IServiceScopeFactory serviceScopeFactory)
+        public NotificationsService(ILogger<NotificationsService> logger, 
+            IMDRabbitNotifications rabbitNotifications, ExchangeConfig exchangeConfig, 
+            IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
             _rabbitNotifications = rabbitNotifications;
@@ -999,6 +1002,14 @@ namespace AppMonederoCommand.Api.HostedServices
                         using (var scope = _serviceScopeFactory.CreateScope())
                         {
                             var _serviceProvider = scope.ServiceProvider;
+                            _busTarjetas = _serviceProvider.GetRequiredService<IBusTarjetas>();
+
+                            foreach(EntReadTarjetas tarjetas in x.Content)
+                            {
+                                _busTarjetas.BCreate(tarjetas);
+                            }
+                            
+
                         }
 
                     }

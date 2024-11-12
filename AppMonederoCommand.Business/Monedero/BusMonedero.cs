@@ -1,4 +1,5 @@
 using AppMonederoCommand.Entities.Config;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace AppMonederoCommand.Business.Monedero;
@@ -35,6 +36,7 @@ public class BusMonedero : IBusMonedero
     private readonly string _errorCodeSesion = Environment.GetEnvironmentVariable("ERROR_CODE_SESION") ?? "";
     private readonly IMDServiceConfig _iMDServiceConfig;
     private readonly IMDParametroConfig _IMDParametroConfig;
+    private readonly IBusTarjetas _busTarjetas;
 
     public BusMonedero(ILogger<BusMonedero> logger, IAuthService auth, IServGenerico servGenerico,
         IDatTarjetaUsuario datTarjetas, IDatFolio datFolio,
@@ -42,7 +44,7 @@ public class BusMonedero : IBusMonedero
         IMDRabbitNotifications notificationsServiceIMD,
         IBusTipoOperaciones busTipoOperaciones,
         ExchangeConfig exchangeConfig, IDatMonedero datMonedero, IBusMotivos busMotivos, IBusTipoTarifa busTipoTarifa, IDatUsuario datUsuario,
-        IMDParametroConfig iMDParametroConfig, IMDServiceConfig iMDServiceConfig)
+        IMDParametroConfig iMDParametroConfig, IMDServiceConfig iMDServiceConfig, IBusTarjetas busTarjetas)
     {
         _logger = logger;
         _servGenerico = servGenerico;
@@ -58,6 +60,7 @@ public class BusMonedero : IBusMonedero
         _datUsuario = datUsuario;
         _IMDParametroConfig = iMDParametroConfig;
         _iMDServiceConfig = iMDServiceConfig;
+        _busTarjetas = busTarjetas;
     }
 
     public async Task<IMDResponse<EntSaldo>> BGetSaldo(Guid uIdMonedero, string token, string? NumeroTarjeta, Guid? uIdUsuario, string? sIdAplicacion = null)
@@ -1405,6 +1408,7 @@ public class BusMonedero : IBusMonedero
 
         try
         {
+            int numeroTarjeta = 0;
             var body = new
             {
                 numeroTarjeta = Convert.ToDecimal(sNumeroTarjeta)
@@ -1413,37 +1417,14 @@ public class BusMonedero : IBusMonedero
             string mensajeBloqueado = string.Empty;
             string ruta = "Tarjetas";
 
-            var httpResponse = await _servGenerico.SPostBody(_urlTarjeta, ruta, body, token);
 
-            if (httpResponse.HasError != true)
+            IMDResponse<EntReadTarjetas> resTarjeta =await _busTarjetas.BGetByNumTarjeta(numeroTarjeta);
+            if (!resTarjeta.HasError)
             {
-                var responseObject = JsonConvert.DeserializeObject<List<EntTarjetaRes>>(JsonConvert.SerializeObject(httpResponse.Result));
-
-                if (responseObject == null)
+                EntReadTarjetas tarjeta = resTarjeta.Result;
+                if (tarjeta.bActivo == true && tarjeta.bBaja == false)
                 {
-                    response.SetError(Menssages.BusNoRespon);
-                    return response;
-                }
-
-                if (responseObject.Count() == 0)
-                {
-                    response.SetError(Menssages.BusVerificatedCard);
-                    return response;
-                }
-
-
-                var tarjeta = responseObject?.First();
-                if (tarjeta == null)
-                {
-                    response.SetError(Menssages.BusNoRespon);
-                    return response;
-                }
-
-                string uIdEstatusTarjeta = tarjeta.idEstatusTarjeta.ToString() ?? "";
-
-                if (tarjeta.Activo == true && tarjeta.Baja == false)
-                {
-                    switch (uIdEstatusTarjeta)
+                    switch (tarjeta.uIdEstatusTarjeta.ToString())
                     {
                         case EntConfiguracionEstatusTarjeta.sActiva:
                             operacionesPermitidas.sTodasOperaciones = OperacionesTarjeta.TodasOperaciones.GetDescription();
@@ -1457,30 +1438,30 @@ public class BusMonedero : IBusMonedero
                         case EntConfiguracionEstatusTarjeta.sBloqueada:
                             if (tarjeta.entMotivos != null)
                             {
-                                if (tarjeta.entMotivos.PermitirReactivar == null)
+                                if (tarjeta.entMotivos.bPermitirReactivar == null)
                                 {
                                     response.ErrorCode = EntConfiguracionEstatusTarjeta.iErrorCodeInformacion;
                                     response.SetError(Menssages.BusCardBloq);// Motivo
                                     return response;
                                 }
-                                if (tarjeta.entMotivos.PermitirReactivar == false)
+                                if (tarjeta.entMotivos.bPermitirReactivar == false)
                                 {
                                     operacionesPermitidas.sDetalles = OperacionesTarjeta.Detalles.GetDescription();
                                     operacionesPermitidas.sMovimientos = OperacionesTarjeta.Movimientos.GetDescription();
                                     operacionesPermitidas.sVisualizar = OperacionesTarjeta.Visualizar.GetDescription();
 
                                     response.ErrorCode = EntConfiguracionEstatusTarjeta.iErrorCodeInformacion;
-                                    response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + tarjeta.entMotivos.Nombre);
+                                    response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + tarjeta.entMotivos.sMotivo);
                                 }
                                 else
                                 {
-                                    if (tarjeta.entMotivos.PermitirOperaciones == null)
+                                    if (tarjeta.entMotivos.bPermitirOperaciones == null)
                                     {
                                         response.ErrorCode = EntConfiguracionEstatusTarjeta.iErrorCodeInformacion;
                                         response.SetError(Menssages.BusCardBloq);
                                         return response;
                                     }
-                                    if (tarjeta.entMotivos.PermitirOperaciones == true)
+                                    if (tarjeta.entMotivos.bPermitirOperaciones == true)
                                     {
                                         operacionesPermitidas.sDetalles = OperacionesTarjeta.Detalles.GetDescription();
                                         operacionesPermitidas.sMovimientos = OperacionesTarjeta.Movimientos.GetDescription();
@@ -1490,7 +1471,7 @@ public class BusMonedero : IBusMonedero
                                         operacionesPermitidas.sVisualizar = OperacionesTarjeta.Visualizar.GetDescription();
 
                                         response.ErrorCode = EntConfiguracionEstatusTarjeta.iErrorCodeInformacion;
-                                        response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + tarjeta.entMotivos.Nombre);
+                                        response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + tarjeta.entMotivos.sMotivo);
                                     }
                                     else
                                     {
@@ -1499,7 +1480,7 @@ public class BusMonedero : IBusMonedero
                                         operacionesPermitidas.sVisualizar = OperacionesTarjeta.Visualizar.GetDescription();
 
                                         response.ErrorCode = EntConfiguracionEstatusTarjeta.iErrorCodeInformacion;
-                                        response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + tarjeta.entMotivos.Nombre);
+                                        response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + tarjeta.entMotivos.sMotivo);
 
                                     }
                                 }
@@ -1521,9 +1502,9 @@ public class BusMonedero : IBusMonedero
                 }
                 else
                 {
-                    if (tarjeta.Activo == false && tarjeta.Baja == true)
+                    if (tarjeta.bActivo == false && tarjeta.bBaja == true)
                     {
-                        switch (uIdEstatusTarjeta)
+                        switch (tarjeta.uIdEstatusTarjeta.ToString())
                         {
 
                             case EntConfiguracionEstatusTarjeta.sBaja:
@@ -1545,6 +1526,7 @@ public class BusMonedero : IBusMonedero
                         return response;
                     }
                 }
+
                 //Ing. Benigno Manzano
                 //Se agrega una validacion adicional en la cual se identifica que las de sin costo no se pueden realizar recargas ni traspasos
                 if (iTipoTarjeta != null)
@@ -1574,10 +1556,11 @@ public class BusMonedero : IBusMonedero
             }
             else
             {
-                response.ErrorCode = httpResponse.ErrorCode;
-                response.SetError(httpResponse.Message);
+                response.ErrorCode = resTarjeta.ErrorCode;
+                response.SetError(resTarjeta.Message);
                 return response;
             }
+
         }
         catch (Exception ex)
         {

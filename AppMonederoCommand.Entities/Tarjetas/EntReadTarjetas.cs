@@ -112,7 +112,7 @@ namespace AppMonederoCommand.Entities.Tarjetas
         //public EntReadDetalleSolicitud? entDetalleSolicitud { get; set; }
         //public EntReadUsuariosTarjetas? entUsuarioTarjeta { get; set; }
         //public EntReadTipoTarifas? entTipoTarifa { get; set; }
-        //public EntMotivo? entMotivos { get; set; }
+        public EntMotivo? entMotivos { get; set; }
         //public EntReadEstatusTarjeta? entEstatusTarjeta { get; set; }
         //public ICollection<EntReadComercioTarjetas>? lstComercioTarjetas { get; set; }
     }

@@ -176,10 +176,10 @@ namespace AppMonederoCommand.Data.Mapping.Tarjetas
             //    .HasForeignKey(c => c.uIdSolicitud)
             //    .HasConstraintName("TARJETAS_SOLICITUD_FK");
 
-            //builder.HasOne(c => c.entTipoTarifa)
-            //    .WithMany(e => e.lstTarjetas)
-            //    .HasForeignKey(c => c.uIdTipoTarifa)
-            //    .HasConstraintName("TARJETAS_TIPOTARIFA_FK");
+            builder.HasOne(c => c.entTipoTarifa)
+                .WithMany(e => e.lstTarjetas)
+                .HasForeignKey(c => c.uIdTipoTarifa)
+                .HasConstraintName("TARJETAS_TIPOTARIFA_FK");
 
             builder.HasOne(c => c.entMotivos)
                 .WithMany(e => e.lstTarjetas)

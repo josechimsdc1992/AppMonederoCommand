@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppMonederoCommand.Data.Entities.TiposTarifa;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +30,7 @@ namespace AppMonederoCommand.Data.Entities.Tarjeta
         public Guid uIdSolicitud { get; set; }
         //public EntSolicitudes entSolicitudes { get; set; }
         public Guid uIdTipoTarifa { get; set; }
-        //public EntTipoTarifa entTipoTarifa { get; set; }
+        public TiposTarifa.TiposTarifa entTipoTarifa { get; set; }
         public Guid uIdEstatusTarjeta { get; set; }
         //public EntEstatusTarjeta entEstatusTarjeta { get; set; }
         public Guid? uIdMotivo { get; set; }

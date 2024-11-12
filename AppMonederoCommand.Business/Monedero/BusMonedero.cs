@@ -22,7 +22,6 @@ public class BusMonedero : IBusMonedero
     private readonly IDatTarjetaUsuario _datTarjetas;
     private readonly string _urlTarjeta = Environment.GetEnvironmentVariable("TARJETA_URL") ?? "";
     private readonly IDatFolio _datFolio;
-    private readonly string _urlMonederoC = Environment.GetEnvironmentVariable("MONEDEROC_URL") ?? "";
     private readonly string _urlMonederoQ = Environment.GetEnvironmentVariable("MONEDEROQ_URL") ?? "";
     private readonly string _urlCatalogo = Environment.GetEnvironmentVariable("URLBASE_PAQUETES") ?? "";
     private readonly IBusParametros _busParametros;
@@ -493,8 +492,7 @@ public class BusMonedero : IBusMonedero
             var _Operacion = _IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_DESCRIPCION;
             Guid _IdTipoOperacion = new Guid(_IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_GUID);
             //Obtiene la operacion
-            List<EntTipoOperaciones> entTipoOperaciones = null;
-            try { entTipoOperaciones = _busTipoOperaciones.BObtenerTipoOperaciones().Result.Result; } catch (Exception e) { }
+            List<EntTipoOperaciones> entTipoOperaciones = _IMDParametroConfig.TipoOperaciones;
             if (entTipoOperaciones != null && entTipoOperaciones.Count > 0)
             {
                 var entOperacion = entTipoOperaciones.SingleOrDefault(x => x.sClave == OperacionesMovimientosMonedero.Traspaso.GetDescription());
@@ -511,6 +509,19 @@ public class BusMonedero : IBusMonedero
             //Valida tarjeta origen
             if (!string.IsNullOrEmpty(entTransferir.sNumeroTarjetaOrigen))
             {
+                int numeroTarjetaOrigen = 0;
+                int.TryParse(entTransferir.sNumeroTarjetaOrigen, out numeroTarjetaOrigen);
+
+                int numeroTarjetaDestino = 0;
+                int.TryParse(entTransferir.sNumeroTarjetaDestino, out numeroTarjetaDestino);
+
+                IMDResponse<EntReadTarjetas> resTarjetaOrigen =await _busTarjetas.BGetByNumTarjeta(numeroTarjetaOrigen);
+                IMDResponse<EntReadTarjetas> resTarjetaDestino = await _busTarjetas.BGetByNumTarjeta(numeroTarjetaDestino);
+                if (!resTarjetaOrigen.HasError)
+                {
+                    
+                }
+
                 var infoTarjeta = await BGetDatosByNumTarjeta(entTransferir.sNumeroTarjetaOrigen, token);
                 if (infoTarjeta != null && !infoTarjeta.HasError)
                 {
@@ -745,7 +756,7 @@ public class BusMonedero : IBusMonedero
             HttpClient httpClient = new HttpClient();
             string ruta = "traspaso-saldo";
 
-            var httpResponse = await _servGenerico.SPostBody(_urlMonederoC, ruta, body, token);
+            var httpResponse = await _servGenerico.SPostBody(_iMDServiceConfig.MonederoC_Host, ruta, body, token);
 
             if (httpResponse.HasError != true)
             {
@@ -933,15 +944,12 @@ public class BusMonedero : IBusMonedero
             _logger.LogInformation("Contenido entidad AbonarSaldo: " + sJson);
 
             HttpClient httpClient = new HttpClient();
-            string ruta = "abonar";
 
-            var httpResponse = await _servGenerico.SPostBody(_urlMonederoC, ruta, body, token);
+            var httpResponse = await _servGenerico.SPostBody(_iMDServiceConfig.MonederoC_Host, _iMDServiceConfig.MonederoC_Abonar, body, token);
 
             if (httpResponse.HasError != true)
             {
-                var saldo = await MonederoSaldo(entAbonar.uIdMonedero, token);
-                response = await _datTarjetas.DUpdateSaldo(entAbonar.uIdMonedero, saldo);
-
+                
                 QueueMessage<EntUpdateFolioEstatusOrden> queue = new()
                 {
                     Content = new()
@@ -951,7 +959,9 @@ public class BusMonedero : IBusMonedero
                     }
                 };
 
-                await _notificationsServiceIMD.SendAsync<EntUpdateFolioEstatusOrden>(AppMonederoCommand.Entities.Enums.RoutingKeys.EstatusOrdenCreacionFolio.GetDescription(), _exchangeConfig, queue);
+                response.SetSuccess(true);
+
+                _notificationsServiceIMD.SendAsync<EntUpdateFolioEstatusOrden>(AppMonederoCommand.Entities.Enums.RoutingKeys.EstatusOrdenCreacionFolio.GetDescription(), _exchangeConfig, queue);
 
                 if (errorCodeEstatus != 0)
                 {
@@ -1033,7 +1043,7 @@ public class BusMonedero : IBusMonedero
                 return response;
             }
             //Termina validación del estatus del monedero
-            var httpResponse = await _servGenerico.SPutBodyModeroC(_urlMonederoC, ruta, reqActualizaMonedero, tokenKong);
+            var httpResponse = await _servGenerico.SPutBodyModeroC(_iMDServiceConfig.MonederoC_Host, ruta, reqActualizaMonedero, tokenKong);
 
             if (httpResponse.HasError != true)
             {
@@ -1409,13 +1419,8 @@ public class BusMonedero : IBusMonedero
         try
         {
             int numeroTarjeta = 0;
-            var body = new
-            {
-                numeroTarjeta = Convert.ToDecimal(sNumeroTarjeta)
-            };
+            int.TryParse(sNumeroTarjeta,out numeroTarjeta);
             EntOperacionesPermitidasTarjeta operacionesPermitidas = new EntOperacionesPermitidasTarjeta();
-            string mensajeBloqueado = string.Empty;
-            string ruta = "Tarjetas";
 
 
             IMDResponse<EntReadTarjetas> resTarjeta =await _busTarjetas.BGetByNumTarjeta(numeroTarjeta);

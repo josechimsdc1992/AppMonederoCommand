@@ -639,11 +639,8 @@ public class BusMonedero : IBusMonedero
                 var infoMonederoOrigen = await BDatosMonedero(entTransferir.uIdMonederoOrigen);
                 if (!infoMonederoOrigen.HasError)
                 {
-                    var tipoTarifa = await BTipoTarifa(infoMonederoOrigen.Result.idTipoTarifa);
-                    if (tipoTarifa.Result != null && !tipoTarifa.HasError)
-                    {
-                        iTipoTarjetaOrigen = tipoTarifa.Result.tipoTarjeta;
-                    }
+                    iTipoTarjetaOrigen=_IMDParametroConfig.TipoTarifas.Where(x => x.uIdTipoTarifa == infoMonederoOrigen.Result.idTipoTarifa).FirstOrDefault().iTipoTarjeta;
+                    
                 }
             }
             var estatusMonederoOrigen = await BEstatusMonedero(entTransferir.uIdMonederoOrigen, iTipoTarjetaOrigen);
@@ -688,11 +685,8 @@ public class BusMonedero : IBusMonedero
                 var infoMonederoDestino = await BDatosMonedero(entTransferir.uIdMonederoDestino);
                 if (!infoMonederoDestino.HasError)
                 {
-                    var tipoTarifa = await BTipoTarifa(infoMonederoDestino.Result.idTipoTarifa);
-                    if (tipoTarifa.Result != null && !tipoTarifa.HasError)
-                    {
-                        iTipoTarjetaDestino = tipoTarifa.Result.tipoTarjeta;
-                    }
+                    iTipoTarjetaDestino = _IMDParametroConfig.TipoTarifas.Where(x => x.uIdTipoTarifa == infoMonederoDestino.Result.idTipoTarifa).FirstOrDefault().iTipoTarjeta;
+
                 }
             }
             var estatusMonederoDestino = await BEstatusMonedero(entTransferir.uIdMonederoDestino, iTipoTarjetaDestino);

@@ -1,4 +1,6 @@
 ﻿using AppMonederoCommand.Entities.Config;
+using IMD.Utils;
+using System.Collections.Generic;
 
 namespace AppMonederoCommand.Business.Parametro
 {
@@ -10,8 +12,12 @@ namespace AppMonederoCommand.Business.Parametro
         private readonly IMDParametroConfig _IMDParametroConfig;
         private readonly IMDEnvironmentConfig _IMDEnvironmentConfig;
         private readonly IBusTipoOperaciones _busTipoOperaciones;
+        private readonly IBusTipoTarifa _busTipoTarifa;
 
-        public BusParametros(ILogger<BusParametros> logger, IDatParametros datParametros, IMDServiceConfig iMDServiceConfig, IMDParametroConfig iMDParametroConfig, IBusTipoOperaciones busTipoOperaciones, IMDEnvironmentConfig iMDEnvironmentConfig)
+        public BusParametros(ILogger<BusParametros> logger, IDatParametros datParametros, 
+            IMDServiceConfig iMDServiceConfig, IMDParametroConfig iMDParametroConfig, 
+            IBusTipoOperaciones busTipoOperaciones, IMDEnvironmentConfig iMDEnvironmentConfig, 
+            IBusTipoTarifa busTipoTarifa)
         {
             _logger = logger;
             _datParametros = datParametros;
@@ -19,6 +25,7 @@ namespace AppMonederoCommand.Business.Parametro
             _IMDParametroConfig = iMDParametroConfig;
             _busTipoOperaciones = busTipoOperaciones;
             _IMDEnvironmentConfig = iMDEnvironmentConfig;
+            _busTipoTarifa= busTipoTarifa;
         }
 
         public async Task<IMDResponse<bool>> BAgregar(EntParametros entParametro)
@@ -253,7 +260,13 @@ namespace AppMonederoCommand.Business.Parametro
             {
                 _IMDParametroConfig.TipoOperaciones = res.Result;
             }
-            
+
+            IMDResponse<List<EntReplicaTipoTarifas>> resTipoTarifa = await _busTipoTarifa.BGetAll();
+            if (!res.HasError)
+            {
+                _IMDParametroConfig.TipoTarifas = resTipoTarifa.Result;
+            }
+
         }
 
     }

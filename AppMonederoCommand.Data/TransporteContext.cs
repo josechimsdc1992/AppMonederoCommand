@@ -21,9 +21,6 @@ public partial class TransporteContext : DbContext
 
     public virtual DbSet<Parametros> Parametros { get; set; }
 
-    public virtual DbSet<UbicacionFavorita> UbicacionFavorita { get; set; }
-
-    public virtual DbSet<Sugerencias> Sugerencias { get; set; }
 
     public virtual DbSet<HistorialRecuperarCuenta> HistorialRecuperarCuenta { get; set; }
 
@@ -45,8 +42,6 @@ public partial class TransporteContext : DbContext
         modelBuilder.ApplyConfiguration(new MapUsuario());
         modelBuilder.ApplyConfiguration(new MapHistorialRefreshToken());
         modelBuilder.ApplyConfiguration(new MapParametros());
-        modelBuilder.ApplyConfiguration(new MapUbicacionFavorita());
-        modelBuilder.ApplyConfiguration(new MapSugerencia());
         modelBuilder.ApplyConfiguration(new MapFirebaseToken());
         modelBuilder.ApplyConfiguration(new MapHistorialRecuperarCuenta());
         modelBuilder.ApplyConfiguration(new MapHistorialRecuperacionToken());

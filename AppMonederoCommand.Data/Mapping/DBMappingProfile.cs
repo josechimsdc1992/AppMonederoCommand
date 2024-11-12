@@ -16,20 +16,6 @@ public class DBMappingProfile : Profile
 {
     public DBMappingProfile()
     {
-        CreateMap<UbicacionFavorita, EntGetAllUbicacionFavorita>();
-
-        CreateMap<UbicacionFavorita, EntUbicacionFavorita>();
-
-        CreateMap<EntAddUbicacionFavorita, UbicacionFavorita>()
-            .ForMember(dest => dest.uIdUbicacionFavorita, opt => opt.MapFrom(src => GetGuid()))
-            .ForMember(dest => dest.dtFechaCreacion, opt => opt.MapFrom(src => DateTime.UtcNow));
-
-        CreateMap<EntAddSugerencia, Sugerencias>()
-            .ForMember(dest => dest.uIdSugerencia, opt => opt.MapFrom(src => GetGuid()))
-            .ForMember(dest => dest.dtFechaRegitro, opt => opt.MapFrom(src => DateTime.UtcNow))
-            .ForMember(dest => dest.dtFechaCreacion, opt => opt.MapFrom(src => DateTime.UtcNow));
-
-        CreateMap<EntSugerencia, EntAddSugerencia>();
 
         CreateMap<HistorialRecuperarCuenta, EntHistorialRecuperarCuenta>();
 

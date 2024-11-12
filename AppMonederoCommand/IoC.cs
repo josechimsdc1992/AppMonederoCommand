@@ -34,19 +34,10 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IDatTarjetaUsuario, DatTarjetaUsuario>();
             #endregion
 
-            #region Ubicaciones Favoritas
-            services.AddScoped<IBusUbicacionFavorita, BusUbicacionFavorita>();
-            services.AddScoped<IDatUbicacionFavorita, DatUbicacionFavorita>();
-            #endregion
 
             #region Historial recuperar cuenta
             services.AddScoped<IBusHistorialRecuperarCuenta, BusHistorialRecuperarCuenta>();
             services.AddScoped<IDatHistorialRecuperarCuenta, DatHistorialRecuperarCuenta>();
-            #endregion
-
-            #region Sugerencia
-            services.AddScoped<IBusSugerencia, BusSugerencia>();
-            services.AddScoped<IDatSugerencia, DatSugerencia>();
             #endregion
 
             #region Peticiones HTTP
@@ -57,9 +48,6 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IAuthService, AuthService>();
             #endregion
 
-            #region Paquetes
-            services.AddScoped<IBusPaquetes, BusPaquetes>();
-            #endregion
 
 
 

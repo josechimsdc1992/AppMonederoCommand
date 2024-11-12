@@ -15,14 +15,6 @@ public class BusMappingProfile : Profile
     public BusMappingProfile()
     {
 
-        CreateMap<EntPaquetesProductosResponse, List<EntPaquete>>()
-              .ConvertUsing(src => src.lstPaquetes.Select(paquete => new EntPaquete
-              {
-                  uIdPaquete = paquete.uIdPaquete,
-                  sNombre = paquete.sNombre,
-                  sDescripcion = paquete.sProducto,
-                  fPrecio = paquete.fPrecioUnitario,
-                  fImporte = paquete.fImporte,
-              }).ToList());
+        
     }
 }

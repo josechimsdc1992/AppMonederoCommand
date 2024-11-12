@@ -15,8 +15,6 @@
         [JsonProperty("Usuario")]
         public EntUsuarioCodigoVerificacion? entUsuario { get; set; }
 
-        [JsonProperty("Favoritos")]
-        public List<EntGetAllUbicacionFavorita>? lisFavoritos { get; set; }
 
         [JsonProperty("Token")]
         public EntTokenCodigoVerificacion entToken { get; set; }

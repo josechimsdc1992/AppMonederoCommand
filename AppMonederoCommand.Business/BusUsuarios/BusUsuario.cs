@@ -22,7 +22,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
         private readonly IServGenerico _servGenerico;
         private readonly string _urlHttpClientMonederoC;
         //Favoritos
-        private readonly IBusUbicacionFavorita _busUbicacionFavorita;
         private readonly IBusTarjetaUsuario _busTarjetaUsuario;
         private readonly IDatUsuarioActualizaTelefono _datUsuarioActualizaTelefono;
         private readonly string _urlCatalogo = Environment.GetEnvironmentVariable("URLBASE_PAQUETES") ?? "";
@@ -32,7 +31,7 @@ namespace AppMonederoCommand.Business.BusUsuarios
 
         public BusUsuario(ILogger<BusUsuario> logger, IDatUsuario datUusario,
             IServiceProvider serviceProvider, ExchangeConfig exchangeConfig, //Se agrega para crear poder enviar publicación al bus
-            IBusJwToken busJwToken, IBusParametros busParametros, IBusUbicacionFavorita busUbicacionFavorita,
+            IBusJwToken busJwToken, IBusParametros busParametros,
             IDatUsuarioActualizaTelefono datUsuarioActualizaTelefono,
             IAuthService auth, IServGenerico servGenerico, IServAzureBlobStorage servAzureBlobStorage,
             IBusMonedero busMonedero, IBusLenguaje busLenguaje, IBusTarjetaUsuario busTarjetaUsuario)
@@ -44,7 +43,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
             this._exchangeConfig = exchangeConfig;
             this._busJwToken = busJwToken;
             this._busParametros = busParametros;
-            this._busUbicacionFavorita = busUbicacionFavorita;
             _datUsuarioActualizaTelefono = datUsuarioActualizaTelefono;
             this._auth = auth;
             this._servGenerico = servGenerico;
@@ -1023,13 +1021,7 @@ namespace AppMonederoCommand.Business.BusUsuarios
                             return sRfreshTokenJWT;
                         }
 
-                        //Termina RefreshToke
-                        var ubicacionFavorita = await _busUbicacionFavorita.BGetAll(usuario.Result.uIdUsuario);
-
-                        if (ubicacionFavorita.HasError != true)
-                        {
-                            List<EntGetAllUbicacionFavorita> listUbicacionesFavoritas = ubicacionFavorita.Result;
-
+                        
                             EntLoginResponse responseAutorization = new EntLoginResponse();
 
                             responseAutorization.entUsuario = new EntLoginUsuario
@@ -1048,7 +1040,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
                                 bMigrado = usuario.Result.bMigrado
                             };
 
-                            responseAutorization.lisFavoritos = listUbicacionesFavoritas;
                             responseAutorization.entToken = new EntLoginToken
                             {
                                 sAccessToken = tokenJWT,
@@ -1102,12 +1093,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
                             }
 
 
-                        }
-                        else
-                        {
-                            response.ErrorCode = ubicacionFavorita.ErrorCode;
-                            response.SetError(ubicacionFavorita.Message);
-                        }
                     }
                     else
                     {
@@ -1324,85 +1309,71 @@ namespace AppMonederoCommand.Business.BusUsuarios
                                             }
 
                                             //Termina RefreshToke
-                                            var ubicacionFavorita = await _busUbicacionFavorita.BGetAll(datosUsuarioMigrado.uIdUsuario);
+                                            EntLoginResponse responseAutorization = new EntLoginResponse();
 
-                                            if (ubicacionFavorita.HasError != true)
+                                            responseAutorization.entUsuario = new EntLoginUsuario
                                             {
-                                                List<EntGetAllUbicacionFavorita> listUbicacionesFavoritas = ubicacionFavorita.Result;
+                                                uIdUsuario = datosUsuarioMigrado.uIdUsuario,
+                                                sNombre = datosUsuarioMigrado.sNombre,
+                                                sApellidoPaterno = datosUsuarioMigrado.sApellidoPaterno,
+                                                sApellidoMaterno = datosUsuarioMigrado.sApellidoMaterno,
+                                                sTelefono = datosUsuarioMigrado.sTelefono,
+                                                sCorreo = datosUsuarioMigrado.sCorreo,
+                                                dtFechaNacimiento = datosUsuarioMigrado.dtFechaNacimiento,
+                                                sCURP = datosUsuarioMigrado.sCURP,
+                                                cGenero = datosUsuarioMigrado.cGenero,
+                                                sFotografia = datosUsuarioMigrado.sFotografia,
+                                                uIdMonedero = datosUsuarioMigrado.uIdMonedero,
+                                                bMigrado = datosUsuarioMigrado.bMigrado
+                                            };
 
-                                                EntLoginResponse responseAutorization = new EntLoginResponse();
+                                            responseAutorization.entToken = new EntLoginToken
+                                            {
+                                                sAccessToken = tokenJWT,
+                                                sRefreshToken = refreshToken,
+                                                dtFechaExpiracion = fechaExpiraRefreshToken
 
-                                                responseAutorization.entUsuario = new EntLoginUsuario
+                                            };
+
+                                            if (datosUsuarioMigrado.uIdMonedero == null)
+                                            {
+                                                httpMonederoC = await BHttpMonederoC(usuario.Result);
+
+                                                if (httpMonederoC.HasError != true)
                                                 {
-                                                    uIdUsuario = datosUsuarioMigrado.uIdUsuario,
-                                                    sNombre = datosUsuarioMigrado.sNombre,
-                                                    sApellidoPaterno = datosUsuarioMigrado.sApellidoPaterno,
-                                                    sApellidoMaterno = datosUsuarioMigrado.sApellidoMaterno,
-                                                    sTelefono = datosUsuarioMigrado.sTelefono,
-                                                    sCorreo = datosUsuarioMigrado.sCorreo,
-                                                    dtFechaNacimiento = datosUsuarioMigrado.dtFechaNacimiento,
-                                                    sCURP = datosUsuarioMigrado.sCURP,
-                                                    cGenero = datosUsuarioMigrado.cGenero,
-                                                    sFotografia = datosUsuarioMigrado.sFotografia,
-                                                    uIdMonedero = datosUsuarioMigrado.uIdMonedero,
-                                                    bMigrado = datosUsuarioMigrado.bMigrado
-                                                };
 
-                                                responseAutorization.lisFavoritos = listUbicacionesFavoritas;
-                                                responseAutorization.entToken = new EntLoginToken
-                                                {
-                                                    sAccessToken = tokenJWT,
-                                                    sRefreshToken = refreshToken,
-                                                    dtFechaExpiracion = fechaExpiraRefreshToken
-
-                                                };
-
-                                                if (datosUsuarioMigrado.uIdMonedero == null)
-                                                {
-                                                    httpMonederoC = await BHttpMonederoC(usuario.Result);
-
-                                                    if (httpMonederoC.HasError != true)
+                                                    foreach (var monedero in httpMonederoC.Result)
                                                     {
-
-                                                        foreach (var monedero in httpMonederoC.Result)
+                                                        responseAutorization.entUsuario.uIdMonedero = monedero.IdMonedero;
+                                                        responseAutorization.entUsuario.sNoMonedero = monedero.NumMonedero.ToString();
+                                                        var monederoAsigando = await _datUsuario.DUpdateMonederoUsuario(usuario.Result.uIdUsuario, monedero.IdMonedero);
+                                                        if (monederoAsigando.HasError == true)
                                                         {
-                                                            responseAutorization.entUsuario.uIdMonedero = monedero.IdMonedero;
-                                                            responseAutorization.entUsuario.sNoMonedero = monedero.NumMonedero.ToString();
-                                                            var monederoAsigando = await _datUsuario.DUpdateMonederoUsuario(usuario.Result.uIdUsuario, monedero.IdMonedero);
-                                                            if (monederoAsigando.HasError == true)
-                                                            {
-                                                                response.ErrorCode = monederoAsigando.ErrorCode;
-                                                                response.SetError(monederoAsigando.Message);
-                                                                return response;
-                                                            }
+                                                            response.ErrorCode = monederoAsigando.ErrorCode;
+                                                            response.SetError(monederoAsigando.Message);
+                                                            return response;
                                                         }
-
-                                                        response.SetSuccess(responseAutorization, Menssages.DatCompleteSucces);
-                                                    }
-                                                    else
-                                                    {
-                                                        response.ErrorCode = httpMonederoC.ErrorCode;
-                                                        response.SetSuccess(responseAutorization, Menssages.BusFailedWallet + httpMonederoC.Message);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    //Obtener los datos del monedero...
-                                                    //var token = _auth.BIniciarSesion().Result;
-                                                    var monedero = _busMonedero.BDatosMonedero(Guid.Parse(responseAutorization.entUsuario.uIdMonedero.ToString())).Result;
-                                                    if (!monedero.HasError)
-                                                    {
-                                                        responseAutorization.entUsuario.sNoMonedero = monedero.Result.numMonedero.ToString();
                                                     }
 
                                                     response.SetSuccess(responseAutorization, Menssages.DatCompleteSucces);
                                                 }
-
+                                                else
+                                                {
+                                                    response.ErrorCode = httpMonederoC.ErrorCode;
+                                                    response.SetSuccess(responseAutorization, Menssages.BusFailedWallet + httpMonederoC.Message);
+                                                }
                                             }
                                             else
                                             {
-                                                response.ErrorCode = ubicacionFavorita.ErrorCode;
-                                                response.SetError(ubicacionFavorita.Message);
+                                                //Obtener los datos del monedero...
+                                                //var token = _auth.BIniciarSesion().Result;
+                                                var monedero = _busMonedero.BDatosMonedero(Guid.Parse(responseAutorization.entUsuario.uIdMonedero.ToString())).Result;
+                                                if (!monedero.HasError)
+                                                {
+                                                    responseAutorization.entUsuario.sNoMonedero = monedero.Result.numMonedero.ToString();
+                                                }
+
+                                                response.SetSuccess(responseAutorization, Menssages.DatCompleteSucces);
                                             }
                                         }
                                         else
@@ -1613,156 +1584,146 @@ namespace AppMonederoCommand.Business.BusUsuarios
                                 var entUsuario = usuarioActualizado.Result;
                                 if (entUsuario != null)
                                 {
-                                    var ubicacionFavorita = await _busUbicacionFavorita.BGetAll(entUsuario.uIdUsuario);
 
-                                    if (ubicacionFavorita.HasError != true)
+                                    var sTokenJWT = await _busJwToken.BGenerarTokenJWT(entUsuario.uIdUsuario);
+                                    var sRfreshTokenJWT = await _busJwToken.BGenerarRefreshToken();
+
+                                    string tokenJWT = string.Empty;
+                                    string refreshToken = string.Empty;
+                                    string fechaExpiraToken = string.Empty;
+                                    Nullable<DateTime> fechaExpiraRefreshToken;
+
+
+                                    if (sTokenJWT.HasError == false)
                                     {
-                                        var sTokenJWT = await _busJwToken.BGenerarTokenJWT(entUsuario.uIdUsuario);
-                                        var sRfreshTokenJWT = await _busJwToken.BGenerarRefreshToken();
-
-                                        string tokenJWT = string.Empty;
-                                        string refreshToken = string.Empty;
-                                        string fechaExpiraToken = string.Empty;
-                                        Nullable<DateTime> fechaExpiraRefreshToken;
-
-                                        List<EntGetAllUbicacionFavorita> listUbicacionesFavoritas = ubicacionFavorita.Result;
-
-                                        if (sTokenJWT.HasError == false)
-                                        {
-                                            tokenJWT = sTokenJWT.Result.token;
-                                            fechaExpiraToken = sTokenJWT.Result.expira;
-                                        }
-                                        else
-                                        {
-                                            return sTokenJWT;
-                                        }
-
-
-                                        //Refreshtoken
-
-                                        if (sRfreshTokenJWT.HasError != true)
-                                        {
-                                            refreshToken = sRfreshTokenJWT.Result;
-                                            //Guardar Historial token
-                                            var historialGuardado = await _busJwToken.BGuardaHistorialRefreshToken(entUsuario.uIdUsuario, tokenJWT, refreshToken);
-
-                                            if (historialGuardado.HasError == true)
-                                            {
-                                                response.ErrorCode = historialGuardado.ErrorCode;
-                                                response.SetError(historialGuardado.Message);
-                                                return response;
-                                            }
-                                            fechaExpiraRefreshToken = historialGuardado.Result.dtFechaExpiracion;
-                                            //Termina guardado de historia
-
-
-                                        }
-                                        else
-                                        {
-                                            response = sRfreshTokenJWT;
-                                            return response;
-                                        }
-
-                                        //Termina RefreshToke
-                                        //Favoritos
-
-                                        //Termina favoritos
-                                        EntTokenCodigoVerificacion token = new EntTokenCodigoVerificacion
-                                        {
-                                            sAccessToken = tokenJWT,
-                                            sRefreshToken = refreshToken,
-                                            dtFechaExpiracion = fechaExpiraRefreshToken
-                                        };
-
-                                        entCodigoResponse.entToken = token;
-                                        //Descarga de imagen del Azure Blob Storage
-                                        entUsuario.sFotografia = "";//Se quita descargar imagen
-                                        if (!string.IsNullOrEmpty(entUsuario.sFotografia))
-                                        {
-                                            var imageUsuario = await BDescargaImagenPerfil(entUsuario.uIdUsuario);
-                                            if (imageUsuario.HasError != true)
-                                            {
-                                                entUsuario.sFotografia = imageUsuario.Result;
-                                            }
-                                            else
-                                            {
-                                                response.ErrorCode = imageUsuario.ErrorCode;
-                                                response.SetError(imageUsuario.Message);
-                                            }
-                                        }
-                                        //Termina Descarga de imagen del Azure Blob Storage
-                                        entCodigoResponse.entUsuario = new EntUsuarioCodigoVerificacion
-                                        {
-                                            uIdUsuario = entUsuario.uIdUsuario,
-                                            sNombre = entUsuario.sNombre,
-                                            sApellidoPaterno = entUsuario.sApellidoPaterno,
-                                            sApellidoMaterno = entUsuario.sApellidoMaterno,
-                                            sTelefono = entUsuario.sTelefono,
-                                            sCorreo = entUsuario.sCorreo,
-                                            dtFechaNacimiento = entUsuario.dtFechaNacimiento,
-                                            sCURP = entUsuario.sCURP,
-                                            cGenero = entUsuario.cGenero,
-                                            sFotografia = entUsuario.sFotografia,
-                                            uIdMonedero = entUsuario.uIdMonedero
-                                        };
-                                        entCodigoResponse.lisFavoritos = listUbicacionesFavoritas;
-
-                                        if (sTokenJWT.Result != null)
-                                        {
-
-                                            response.SetSuccess(entCodigoResponse);
-                                            #region Enviar correo
-                                            try
-                                            {
-                                                string plantilla = string.Empty;
-
-                                                try
-                                                {
-                                                    plantilla = _busLenguaje.BusSetLanguajeBienvenido();
-                                                    if (string.IsNullOrEmpty(plantilla))
-                                                    {
-                                                        return response;
-                                                    }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    _logger.LogError(IMDSerializer.Serialize(67823462144662, $"Error en {metodo}(EntCodigoVerificacion codigo): {ex.Message}", codigo, ex, response));
-                                                    return response;
-                                                }
-
-                                                string nombre = entUsuario.sNombre + " " + entUsuario.sApellidoPaterno + " " + entUsuario.sApellidoMaterno;
-                                                plantilla = plantilla.Replace("{Nombre}", nombre.Trim());
-
-                                                string badge_googleplay = _busParametros.BObtener("APP_BADGE_GOOGLE_PLAY").Result.Result.sValor ?? "";
-                                                string badge_appstore = _busParametros.BObtener("APP_BADGE_APP_STORE").Result.Result.sValor ?? "";
-
-                                                plantilla = plantilla.Replace("{badge_google_play}", badge_googleplay);
-                                                plantilla = plantilla.Replace("{badge_app_store}", badge_appstore);
-
-                                                EntBusMessCorreo busMessage = new EntBusMessCorreo
-                                                {
-                                                    uIdUsuario = entUsuario.uIdUsuario,
-                                                    sMensaje = plantilla,
-                                                    sCorreoElectronico = entUsuario.sCorreo,
-                                                    bHtml = true
-                                                };
-                                                ///Envío a bus evento Nueva Cuenta Código de Verificacion  
-                                                await _rabbitNotifications.SendAsync(RoutingKeys.NotificacionEmail.GetDescription(), _exchangeConfig, new QueueMessage<EntBusMessCorreo>
-                                                {
-                                                    Content = busMessage
-                                                });
-                                            }
-                                            catch { }
-                                            #endregion
-                                        }
-                                        else
-                                        {
-                                            response.SetError(Menssages.BusNoAddCorrectToken);
-                                        }
+                                        tokenJWT = sTokenJWT.Result.token;
+                                        fechaExpiraToken = sTokenJWT.Result.expira;
                                     }
                                     else
                                     {
-                                        response = ubicacionFavorita;
+                                        return sTokenJWT;
+                                    }
+
+
+                                    //Refreshtoken
+
+                                    if (sRfreshTokenJWT.HasError != true)
+                                    {
+                                        refreshToken = sRfreshTokenJWT.Result;
+                                        //Guardar Historial token
+                                        var historialGuardado = await _busJwToken.BGuardaHistorialRefreshToken(entUsuario.uIdUsuario, tokenJWT, refreshToken);
+
+                                        if (historialGuardado.HasError == true)
+                                        {
+                                            response.ErrorCode = historialGuardado.ErrorCode;
+                                            response.SetError(historialGuardado.Message);
+                                            return response;
+                                        }
+                                        fechaExpiraRefreshToken = historialGuardado.Result.dtFechaExpiracion;
+                                        //Termina guardado de historia
+
+
+                                    }
+                                    else
+                                    {
+                                        response = sRfreshTokenJWT;
+                                        return response;
+                                    }
+
+                                    //Termina RefreshToke
+                                    //Favoritos
+
+                                    //Termina favoritos
+                                    EntTokenCodigoVerificacion token = new EntTokenCodigoVerificacion
+                                    {
+                                        sAccessToken = tokenJWT,
+                                        sRefreshToken = refreshToken,
+                                        dtFechaExpiracion = fechaExpiraRefreshToken
+                                    };
+
+                                    entCodigoResponse.entToken = token;
+                                    //Descarga de imagen del Azure Blob Storage
+                                    entUsuario.sFotografia = "";//Se quita descargar imagen
+                                    if (!string.IsNullOrEmpty(entUsuario.sFotografia))
+                                    {
+                                        var imageUsuario = await BDescargaImagenPerfil(entUsuario.uIdUsuario);
+                                        if (imageUsuario.HasError != true)
+                                        {
+                                            entUsuario.sFotografia = imageUsuario.Result;
+                                        }
+                                        else
+                                        {
+                                            response.ErrorCode = imageUsuario.ErrorCode;
+                                            response.SetError(imageUsuario.Message);
+                                        }
+                                    }
+                                    //Termina Descarga de imagen del Azure Blob Storage
+                                    entCodigoResponse.entUsuario = new EntUsuarioCodigoVerificacion
+                                    {
+                                        uIdUsuario = entUsuario.uIdUsuario,
+                                        sNombre = entUsuario.sNombre,
+                                        sApellidoPaterno = entUsuario.sApellidoPaterno,
+                                        sApellidoMaterno = entUsuario.sApellidoMaterno,
+                                        sTelefono = entUsuario.sTelefono,
+                                        sCorreo = entUsuario.sCorreo,
+                                        dtFechaNacimiento = entUsuario.dtFechaNacimiento,
+                                        sCURP = entUsuario.sCURP,
+                                        cGenero = entUsuario.cGenero,
+                                        sFotografia = entUsuario.sFotografia,
+                                        uIdMonedero = entUsuario.uIdMonedero
+                                    };
+
+                                    if (sTokenJWT.Result != null)
+                                    {
+
+                                        response.SetSuccess(entCodigoResponse);
+                                        #region Enviar correo
+                                        try
+                                        {
+                                            string plantilla = string.Empty;
+
+                                            try
+                                            {
+                                                plantilla = _busLenguaje.BusSetLanguajeBienvenido();
+                                                if (string.IsNullOrEmpty(plantilla))
+                                                {
+                                                    return response;
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                _logger.LogError(IMDSerializer.Serialize(67823462144662, $"Error en {metodo}(EntCodigoVerificacion codigo): {ex.Message}", codigo, ex, response));
+                                                return response;
+                                            }
+
+                                            string nombre = entUsuario.sNombre + " " + entUsuario.sApellidoPaterno + " " + entUsuario.sApellidoMaterno;
+                                            plantilla = plantilla.Replace("{Nombre}", nombre.Trim());
+
+                                            string badge_googleplay = _busParametros.BObtener("APP_BADGE_GOOGLE_PLAY").Result.Result.sValor ?? "";
+                                            string badge_appstore = _busParametros.BObtener("APP_BADGE_APP_STORE").Result.Result.sValor ?? "";
+
+                                            plantilla = plantilla.Replace("{badge_google_play}", badge_googleplay);
+                                            plantilla = plantilla.Replace("{badge_app_store}", badge_appstore);
+
+                                            EntBusMessCorreo busMessage = new EntBusMessCorreo
+                                            {
+                                                uIdUsuario = entUsuario.uIdUsuario,
+                                                sMensaje = plantilla,
+                                                sCorreoElectronico = entUsuario.sCorreo,
+                                                bHtml = true
+                                            };
+                                            ///Envío a bus evento Nueva Cuenta Código de Verificacion  
+                                            await _rabbitNotifications.SendAsync(RoutingKeys.NotificacionEmail.GetDescription(), _exchangeConfig, new QueueMessage<EntBusMessCorreo>
+                                            {
+                                                Content = busMessage
+                                            });
+                                        }
+                                        catch { }
+                                        #endregion
+                                    }
+                                    else
+                                    {
+                                        response.SetError(Menssages.BusNoAddCorrectToken);
                                     }
                                 }
                                 else
@@ -3377,109 +3338,98 @@ namespace AppMonederoCommand.Business.BusUsuarios
                             }
 
                             //Termina actualización de monedero
-                            var ubicacionFavorita = await _busUbicacionFavorita.BGetAll(entUsuario.uIdUsuario);
+                            var sTokenJWT = await _busJwToken.BGenerarTokenJWT(entUsuario.uIdUsuario);
+                            var sRfreshTokenJWT = await _busJwToken.BGenerarRefreshToken();
 
-                            if (ubicacionFavorita.HasError != true)
+                            string tokenJWT = string.Empty;
+                            string refreshToken = string.Empty;
+                            string fechaExpiraToken = string.Empty;
+                            Nullable<DateTime> fechaExpiraRefreshToken;
+
+
+                            if (sTokenJWT.HasError == false)
                             {
-                                var sTokenJWT = await _busJwToken.BGenerarTokenJWT(entUsuario.uIdUsuario);
-                                var sRfreshTokenJWT = await _busJwToken.BGenerarRefreshToken();
-
-                                string tokenJWT = string.Empty;
-                                string refreshToken = string.Empty;
-                                string fechaExpiraToken = string.Empty;
-                                Nullable<DateTime> fechaExpiraRefreshToken;
-
-                                List<EntGetAllUbicacionFavorita> listUbicacionesFavoritas = ubicacionFavorita.Result;
-
-                                if (sTokenJWT.HasError == false)
-                                {
-                                    tokenJWT = sTokenJWT.Result.token;
-                                    fechaExpiraToken = sTokenJWT.Result.expira;
-                                }
-                                else
-                                {
-                                    return sTokenJWT;
-                                }
-
-                                //Refreshtoken
-                                if (sRfreshTokenJWT.HasError != true)
-                                {
-                                    refreshToken = sRfreshTokenJWT.Result;
-                                    //Guardar Historial token
-                                    var historialGuardado = await _busJwToken.BGuardaHistorialRefreshToken(entUsuario.uIdUsuario, tokenJWT, refreshToken);
-
-                                    if (historialGuardado.HasError == true)
-                                    {
-                                        response.ErrorCode = historialGuardado.ErrorCode;
-                                        response.SetError(historialGuardado.Message);
-                                        return response;
-                                    }
-                                    fechaExpiraRefreshToken = historialGuardado.Result.dtFechaExpiracion;
-                                    //Termina guardado de historia
-                                }
-                                else
-                                {
-                                    response = sRfreshTokenJWT;
-                                    return response;
-                                }
-
-                                //Termina RefreshToke
-                                //Favoritos
-
-                                //Termina favoritos
-                                EntTokenCodigoVerificacion token = new EntTokenCodigoVerificacion
-                                {
-                                    sAccessToken = tokenJWT,
-                                    sRefreshToken = refreshToken,
-                                    dtFechaExpiracion = fechaExpiraRefreshToken
-                                };
-
-                                entCodigoResponse.entToken = token;
-                                //Descarga de imagen del Azure Blob Storage
-                                entUsuario.sFotografia = "";//Se quita descargar imagen
-                                if (!string.IsNullOrEmpty(entUsuario.sFotografia))
-                                {
-                                    var imageUsuario = await BDescargaImagenPerfil(entUsuario.uIdUsuario);
-                                    if (imageUsuario.HasError != true)
-                                    {
-                                        entUsuario.sFotografia = imageUsuario.Result;
-                                    }
-                                    else
-                                    {
-                                        response.ErrorCode = imageUsuario.ErrorCode;
-                                        response.SetError(imageUsuario.Message);
-                                    }
-                                }
-                                //Termina Descarga de imagen del Azure Blob Storage
-                                entCodigoResponse.entUsuario = new EntUsuarioCodigoVerificacion
-                                {
-                                    uIdUsuario = entUsuario.uIdUsuario,
-                                    sNombre = entUsuario.sNombre,
-                                    sApellidoPaterno = entUsuario.sApellidoPaterno,
-                                    sApellidoMaterno = entUsuario.sApellidoMaterno ?? "",
-                                    sTelefono = entUsuario.sTelefono ?? "",
-                                    sCorreo = entUsuario.sCorreo ?? "",
-                                    dtFechaNacimiento = entUsuario.dtFechaNacimiento,
-                                    sCURP = entUsuario.sCURP,
-                                    cGenero = entUsuario.cGenero,
-                                    sFotografia = entUsuario.sFotografia,
-                                    uIdMonedero = entUsuario.uIdMonedero
-                                };
-                                entCodigoResponse.lisFavoritos = listUbicacionesFavoritas;
-
-                                if (sTokenJWT.Result != null)
-                                {
-
-                                    response.SetSuccess(entCodigoResponse);
-                                }
-                                else
-                                {
-                                    response.SetError(Menssages.BusNoAddCorrectToken);
-                                }
+                                tokenJWT = sTokenJWT.Result.token;
+                                fechaExpiraToken = sTokenJWT.Result.expira;
                             }
                             else
                             {
-                                response = ubicacionFavorita;
+                                return sTokenJWT;
+                            }
+
+                            //Refreshtoken
+                            if (sRfreshTokenJWT.HasError != true)
+                            {
+                                refreshToken = sRfreshTokenJWT.Result;
+                                //Guardar Historial token
+                                var historialGuardado = await _busJwToken.BGuardaHistorialRefreshToken(entUsuario.uIdUsuario, tokenJWT, refreshToken);
+
+                                if (historialGuardado.HasError == true)
+                                {
+                                    response.ErrorCode = historialGuardado.ErrorCode;
+                                    response.SetError(historialGuardado.Message);
+                                    return response;
+                                }
+                                fechaExpiraRefreshToken = historialGuardado.Result.dtFechaExpiracion;
+                                //Termina guardado de historia
+                            }
+                            else
+                            {
+                                response = sRfreshTokenJWT;
+                                return response;
+                            }
+
+                            //Termina RefreshToke
+                            //Favoritos
+
+                            //Termina favoritos
+                            EntTokenCodigoVerificacion token = new EntTokenCodigoVerificacion
+                            {
+                                sAccessToken = tokenJWT,
+                                sRefreshToken = refreshToken,
+                                dtFechaExpiracion = fechaExpiraRefreshToken
+                            };
+
+                            entCodigoResponse.entToken = token;
+                            //Descarga de imagen del Azure Blob Storage
+                            entUsuario.sFotografia = "";//Se quita descargar imagen
+                            if (!string.IsNullOrEmpty(entUsuario.sFotografia))
+                            {
+                                var imageUsuario = await BDescargaImagenPerfil(entUsuario.uIdUsuario);
+                                if (imageUsuario.HasError != true)
+                                {
+                                    entUsuario.sFotografia = imageUsuario.Result;
+                                }
+                                else
+                                {
+                                    response.ErrorCode = imageUsuario.ErrorCode;
+                                    response.SetError(imageUsuario.Message);
+                                }
+                            }
+                            //Termina Descarga de imagen del Azure Blob Storage
+                            entCodigoResponse.entUsuario = new EntUsuarioCodigoVerificacion
+                            {
+                                uIdUsuario = entUsuario.uIdUsuario,
+                                sNombre = entUsuario.sNombre,
+                                sApellidoPaterno = entUsuario.sApellidoPaterno,
+                                sApellidoMaterno = entUsuario.sApellidoMaterno ?? "",
+                                sTelefono = entUsuario.sTelefono ?? "",
+                                sCorreo = entUsuario.sCorreo ?? "",
+                                dtFechaNacimiento = entUsuario.dtFechaNacimiento,
+                                sCURP = entUsuario.sCURP,
+                                cGenero = entUsuario.cGenero,
+                                sFotografia = entUsuario.sFotografia,
+                                uIdMonedero = entUsuario.uIdMonedero
+                            };
+
+                            if (sTokenJWT.Result != null)
+                            {
+
+                                response.SetSuccess(entCodigoResponse);
+                            }
+                            else
+                            {
+                                response.SetError(Menssages.BusNoAddCorrectToken);
                             }
                         }
                         else

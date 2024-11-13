@@ -1436,10 +1436,10 @@ public class BusMonedero : IBusMonedero
             //Valida que estatus tiene el monedero
             if (entInfoMonedero.Activo == true && entInfoMonedero.Baja == false)
             {
-                IMDResponse<EntMotivo> resMotivo = new IMDResponse<EntMotivo>();
+                EntMotivo motivo=null;
                 if (entInfoMonedero.uIdMotivo != null)
                 {
-                    resMotivo = await _busMotivos.BObtenerMotivo(entInfoMonedero.uIdMotivo.Value);
+                    motivo = _IMDParametroConfig.Motivos.Where(x => x.uIdMotivo == entInfoMonedero.uIdMotivo.Value).FirstOrDefault();
                 }
                 switch (entInfoMonedero.IdEstatusMonedero.ToString())
                 {
@@ -1448,32 +1448,32 @@ public class BusMonedero : IBusMonedero
                         response.SetSuccess(operacionesPermitidas);
                         break;
                     case EntConfiguracionEstatusMonedero.sBloqueado:
-                        if (resMotivo.Result != null)
+                        if (motivo != null)
                         {
-                            if (resMotivo.Result.bPermitirReactivar == null)
+                            if (motivo.bPermitirReactivar == null)
                             {
                                 response.ErrorCode = EntConfiguracionEstatusMonedero.iErrorCodeInformacion;
                                 response.SetError(Menssages.BusMonederoBloqValid);// Motivo
                                 return response;
                             }
 
-                            if (resMotivo.Result.bPermitirReactivar == false)
+                            if (motivo.bPermitirReactivar == false)
                             {
                                 operacionesPermitidas.sDetalles = OperacionesMonedero.Detalles.GetDescription();
                                 operacionesPermitidas.sMovimientos = OperacionesMonedero.Movimientos.GetDescription();
 
                                 response.ErrorCode = EntConfiguracionEstatusMonedero.iErrorCodeInformacion;
-                                response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + resMotivo.Result.sMotivo);
+                                response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + motivo.sMotivo);
                             }
                             else
                             {
-                                if (resMotivo.Result.bPermitirOperaciones == null)
+                                if (motivo.bPermitirOperaciones == null)
                                 {
                                     response.ErrorCode = EntConfiguracionEstatusMonedero.iErrorCodeInformacion;
                                     response.SetError(Menssages.BusMonederoBloqValid);// Motivo
                                     return response;
                                 }
-                                if (resMotivo.Result.bPermitirOperaciones == true)
+                                if (motivo.bPermitirOperaciones == true)
                                 {
                                     operacionesPermitidas.sDetalles = OperacionesMonedero.Detalles.GetDescription();
                                     operacionesPermitidas.sMovimientos = OperacionesMonedero.Movimientos.GetDescription();
@@ -1482,7 +1482,7 @@ public class BusMonedero : IBusMonedero
                                     operacionesPermitidas.sVerTarjetas = OperacionesMonedero.VerTarjetas.GetDescription();
 
                                     response.ErrorCode = EntConfiguracionEstatusMonedero.iErrorCodeInformacion;
-                                    response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + resMotivo.Result.sMotivo);
+                                    response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + motivo.sMotivo);
                                 }
                                 else
                                 {
@@ -1491,7 +1491,7 @@ public class BusMonedero : IBusMonedero
                                     operacionesPermitidas.sVerTarjetas = OperacionesMonedero.VerTarjetas.GetDescription();
 
                                     response.ErrorCode = EntConfiguracionEstatusMonedero.iErrorCodeInformacion;
-                                    response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + resMotivo.Result.sMotivo);
+                                    response.SetSuccess(operacionesPermitidas, $"{Menssages.BusIsBloq}: " + motivo.sMotivo);
 
                                 }
                             }

@@ -14,11 +14,12 @@ namespace AppMonederoCommand.Business.Parametro
         private readonly IMDEnvironmentConfig _IMDEnvironmentConfig;
         private readonly IBusTipoOperaciones _busTipoOperaciones;
         private readonly IBusTipoTarifa _busTipoTarifa;
+        private readonly IBusMotivos _busMotivos;
 
         public BusParametros(ILogger<BusParametros> logger, IDatParametros datParametros, 
             IMDServiceConfig iMDServiceConfig, IMDParametroConfig iMDParametroConfig, 
             IBusTipoOperaciones busTipoOperaciones, IMDEnvironmentConfig iMDEnvironmentConfig, 
-            IBusTipoTarifa busTipoTarifa)
+            IBusTipoTarifa busTipoTarifa, IBusMotivos busMotivos)
         {
             _logger = logger;
             _datParametros = datParametros;
@@ -27,6 +28,7 @@ namespace AppMonederoCommand.Business.Parametro
             _busTipoOperaciones = busTipoOperaciones;
             _IMDEnvironmentConfig = iMDEnvironmentConfig;
             _busTipoTarifa= busTipoTarifa;
+            _busMotivos=busMotivos;
         }
 
         public async Task<IMDResponse<bool>> BAgregar(EntParametros entParametro)
@@ -355,6 +357,12 @@ namespace AppMonederoCommand.Business.Parametro
             }
 
             IMDResponse<List<EntReplicaTipoTarifas>> resTipoTarifa = await _busTipoTarifa.BGetAll();
+            if (!res.HasError)
+            {
+                _IMDParametroConfig.TipoTarifas = resTipoTarifa.Result;
+            }
+
+            IMDResponse<List<EntMotivo>> resMotivos = await _busMotivos.BObtenerTodos();
             if (!res.HasError)
             {
                 _IMDParametroConfig.TipoTarifas = resTipoTarifa.Result;

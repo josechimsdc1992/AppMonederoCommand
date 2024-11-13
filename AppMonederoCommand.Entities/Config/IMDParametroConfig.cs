@@ -1,4 +1,5 @@
 ﻿using AppMonederoCommand.Entities.Boletos.ResponseHTTP.EntResponseHTTP;
+using AppMonederoCommand.Entities.Catalogos;
 using AppMonederoCommand.Entities.Replicas;
 using AppMonederoCommand.Entities.TipoOperaciones;
 using AppMonederoCommand.Entities.TipoTarifa;
@@ -26,5 +27,6 @@ namespace AppMonederoCommand.Entities.Config
         public string _errorCodeSesion { get;set; }
         public List<EntTipoOperaciones> TipoOperaciones { get; set; }
         public List<EntReplicaTipoTarifas> TipoTarifas { get; set; }
+        public List<EntMotivo> Motivos { get; set; }
     }
 }

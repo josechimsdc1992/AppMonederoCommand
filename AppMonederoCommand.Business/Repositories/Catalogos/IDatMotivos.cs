@@ -6,5 +6,6 @@
         Task<IMDResponse<bool>> DActualizar(EntMotivo entMotivo);
         Task<IMDResponse<bool>> DEliminar(Guid uIdMotivo);
         Task<IMDResponse<EntMotivo>> DObtenerMotivo(Guid uIdMotivo);
+        Task<IMDResponse<List<EntMotivo>>> DObtenerTodos();
     }
 }

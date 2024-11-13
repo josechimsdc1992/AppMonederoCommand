@@ -1,6 +1,7 @@
 ﻿namespace AppMonederoCommand.Data.Queries.Catalogos
 {
     using DatMapper = IMD.Utils.IMDAutoMapper<AppMonederoCommand.Entities.Catalogos.EntMotivo, AppMonederoCommand.Data.Entities.Catalogos.Motivo>;
+    using BusMapper = IMD.Utils.IMDAutoMapper<AppMonederoCommand.Data.Entities.Catalogos.Motivo, AppMonederoCommand.Entities.Catalogos.EntMotivo>;
     public class DatMotivos : IDatMotivos
     {
         private readonly TransporteContext _dbContext;
@@ -160,6 +161,35 @@
                 response.ErrorCode = 500;
                 response.SetError(ex);
                 _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo.sNombre}{metodo.sParametros}: {ex.Message}", uIdMotivo, ex, response));
+            }
+            return response;
+        }
+
+        [IMDMetodo(67823465957401, 67823465958178)]
+        public async Task<IMDResponse<List<EntMotivo>>> DObtenerTodos()
+        {
+            IMDResponse<List<EntMotivo>> response = new IMDResponse<List<EntMotivo>>();
+            IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
+            _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo.sNombre}{metodo.sParametros}"));
+
+            try
+            {
+                var motivo = await _dbContext.Motivo.ToListAsync();
+                if (motivo != null)
+                {
+                    List<EntMotivo> entMotivo = BusMapper.MapList(motivo);
+                    response.SetSuccess(entMotivo, Menssages.DatGetSuccessInfo);
+                }
+                else
+                {
+                    response.SetError(Menssages.DatNoGetRegister);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorCode = 500;
+                response.SetError(ex);
+                _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo.sNombre}{metodo.sParametros}: {ex.Message}", ex, response));
             }
             return response;
         }

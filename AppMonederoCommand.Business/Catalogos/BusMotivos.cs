@@ -99,5 +99,24 @@
             }
             return response;
         }
+        [IMDMetodo(67823465969833, 67823465970610)]
+        public async Task<IMDResponse<List<EntMotivo>>> BObtenerTodos()
+        {
+            IMDResponse<List<EntMotivo>> response = new IMDResponse<List<EntMotivo>>();
+            IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
+            _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo.sNombre}{metodo.sParametros}"));
+
+            try
+            {
+                response = await _datMotivos.DObtenerTodos();
+            }
+            catch (Exception ex)
+            {
+                response.ErrorCode = 500;
+                response.SetError(ex);
+                _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo.sNombre}{metodo.sParametros}: {ex.Message}", ex, response));
+            }
+            return response;
+        }
     }
 }

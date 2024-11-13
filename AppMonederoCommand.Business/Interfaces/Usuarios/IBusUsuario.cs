@@ -36,7 +36,6 @@
         Task<IMDResponse<bool>> BEliminarUsuario(Guid uIdUsuario);
         Task<IMDResponse<EntUsuario>> BGetByCorreo(string Email);
         Task<IMDResponse<dynamic>> BGuardaImagenPerfil(EntRequestBlobStorage requestImagenPerfil);
-        Task<IMDResponse<EntUsuarioTarifa>> BUsuarioTarifa(Guid uIdUsuario, string sToken, string sIdAplicacion);
         Task<IMDResponse<dynamic>> BDescargaImagenPerfil(Guid uIdUsuario);
         Task<IMDResponse<dynamic>> BEliminaImagenPerfil(Guid uIdUsuario);
         Task<IMDResponse<dynamic>> BActualizaDatosMonedero(EntUsuario datosUsuario);
@@ -47,7 +46,7 @@
         Task<IMDResponse<List<EntFirebaseToken>>> BObtenerFireBaseToken(Guid uIdUsuario, int iTop = 0, string? sIdAplicacion = null);
         Task<IMDResponse<bool>> EnviarMultipleCorreo(EntBusMessCorreoMultiples entBusMessMultipleCorreo);
         Task<IMDResponse<bool>> BNotificarTraspaso(string sMonederoOrigen, string sMonederoDestino, Guid uIdUsuario, TraspasoSaldoRequestModel traspasoSaldoRequestModel);
-        Task<IMDResponse<EntUsuario>> BGetByMonedero(Guid uIdMonedero, string? sIdAplicacion = null);
+        
         Task<IMDResponse<EntUsuario>> BValidaMonederoUsuario(Guid uIdUsuario);
 
         Task<IMDResponse<dynamic>> BDescargaImagenUsuarioApp(Guid uIdUsuario);

@@ -23,7 +23,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
         private readonly IServGenerico _servGenerico;
         private readonly string _urlHttpClientMonederoC;
         //Favoritos
-        private readonly IBusTarjetaUsuario _busTarjetaUsuario;
         private readonly string _urlCatalogo = Environment.GetEnvironmentVariable("URLBASE_PAQUETES") ?? "";
         //Azure Blob Storage
         private readonly IServAzureBlobStorage _servAzureBlobStorage;
@@ -34,7 +33,7 @@ namespace AppMonederoCommand.Business.BusUsuarios
             IServiceProvider serviceProvider, ExchangeConfig exchangeConfig, //Se agrega para crear poder enviar publicación al bus
             IBusJwToken busJwToken, IBusParametros busParametros,
             IAuthService auth, IServGenerico servGenerico, IServAzureBlobStorage servAzureBlobStorage,
-            IBusMonedero busMonedero, IBusLenguaje busLenguaje, IBusTarjetaUsuario busTarjetaUsuario,
+            IBusMonedero busMonedero, IBusLenguaje busLenguaje,
             IMDParametroConfig iMDParametroConfig)
         {
             this._logger = logger;
@@ -50,7 +49,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
             this._servAzureBlobStorage = servAzureBlobStorage;
             _busMonedero = busMonedero;
             _busLenguaje = busLenguaje;
-            _busTarjetaUsuario = busTarjetaUsuario;
             _IMDParametroConfig = iMDParametroConfig;
         }
 
@@ -2870,132 +2868,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
             return response;
         }
 
-        [IMDMetodo(67823463543262, 67823463542485)]
-        public async Task<IMDResponse<EntUsuarioTarifa>> BUsuarioTarifa(Guid uIdUsuario, string sToken, string sIdAplicacion)
-        {
-            IMDResponse<EntUsuarioTarifa> response = new IMDResponse<EntUsuarioTarifa>();
-
-            IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
-            _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo}(Guid uIdUsuario, string sToken)", uIdUsuario, sToken));
-
-            try
-            {
-                var resEntUsuario = await _datUsuario.DGetUsuario(uIdUsuario);
-                string ruta = string.Empty;
-
-                if (resEntUsuario.HasError != true)
-                {
-                    if (sIdAplicacion != null)
-                    {
-                        if ((resEntUsuario.Result.iEstatusCuenta == (int)eEstatusCuenta.BLOQUEADO || resEntUsuario.Result.iEstatusCuenta == (int)eEstatusCuenta.DESBLOQUEADO) && resEntUsuario.Result.sIdAplicacion != sIdAplicacion)
-                        {
-                            response.SetError(Menssages.BusLoginOtherDevice);
-                            response.Result = new EntUsuarioTarifa();
-                            response.HttpCode = HttpStatusCode.PreconditionFailed;
-                            response.ErrorCode = int.Parse(_errorCodeSesion);
-                            return response;
-                        }
-                        if (resEntUsuario.Result.iEstatusCuenta == (int)eEstatusCuenta.REPORTADO)
-                        {
-                            response.SetError(Menssages.BusBlockedAccountApp);
-                            response.Result = new EntUsuarioTarifa();
-                            response.HttpCode = HttpStatusCode.PreconditionFailed;
-                            response.ErrorCode = int.Parse(_errorCodeSesion);
-                            return response;
-                        }
-                    }
-
-                    if (resEntUsuario.Result.uIdMonedero == null)
-                    {
-                        response.SetError(Menssages.BusUserNoMonedero);
-                        return response;
-                    }
-                    else
-                    {
-                        //Obtener los datos del monedero...
-                        var monedero = _busMonedero.BDatosMonedero(Guid.Parse(resEntUsuario.Result.uIdMonedero.ToString())).Result;
-                        if (!monedero.HasError)
-                        {
-                            resEntUsuario.Result.sNoMonedero = monedero.Result.numMonedero.ToString();
-                        }
-                    }
-
-                    var resEntSaldo = await _busMonedero.BGetSaldo(resEntUsuario.Result.uIdMonedero.Value, sToken, null, null);
-
-                    if (resEntSaldo.HasError != true)
-                    {
-
-                        resEntUsuario.Result.bBajaMonedero = resEntSaldo.Result.bBajaMonedero;
-
-                        //Descarga de imagen del Azure Blob Storage
-                        resEntUsuario.Result.sFotografia = "";//Se quita descargar imagen
-                        if (!string.IsNullOrEmpty(resEntUsuario.Result.sFotografia))
-                        {
-                            var imageUsuario = await BDescargaImagenPerfil(resEntUsuario.Result.uIdUsuario);
-                            if (imageUsuario.HasError != true)
-                            {
-                                resEntUsuario.Result.sFotografia = imageUsuario.Result;
-                            }
-                            else
-                            {
-                                response.ErrorCode = imageUsuario.ErrorCode;
-                                response.SetError(imageUsuario.Message);
-                            }
-                        }
-                        //Termina Descarga de imagen del Azure Blob Storage
-
-                        #region Numero de boletos
-                        EntUsuarioConfiguracion entUsuarioConfig = new EntUsuarioConfiguracion();
-
-                        var idTarifaGeneral = _busParametros.BObtener("APP_TARIFAGENERAL_GUID").Result.Result.sValor ?? Guid.Empty.ToString();
-                        string maxBoletos = null;
-                        bool bPermiteEditar = false;
-                        if (Guid.Parse(idTarifaGeneral) == resEntSaldo.Result.uIdTipoTarifa)
-                        {
-                            maxBoletos = _busParametros.BObtener("MAXBOLETOS_GRAL").Result.Result.sValor;
-                            bPermiteEditar = true;
-                        }
-                        else
-                        {
-                            maxBoletos = _busParametros.BObtener("MAXBOLETOS").Result.Result.sValor;
-                        }
-
-                        entUsuarioConfig.sMaxBoletos = maxBoletos;
-                        #endregion
-
-                        EntUsuarioTarifa entUsuarioTarifa = new EntUsuarioTarifa
-                        {
-                            entUsuario = resEntUsuario.Result,
-                            entSaldo = resEntSaldo.Result,
-                            entUsuarioConfiguracion = entUsuarioConfig
-                        };
-
-                        entUsuarioTarifa.entUsuario.bPermiteEditar = bPermiteEditar;
-
-                        response.SetSuccess(entUsuarioTarifa);
-                    }
-                    else
-                    {
-                        response.ErrorCode = resEntSaldo.ErrorCode;
-                        response.SetError(resEntSaldo.Message);
-                    }
-                }
-                else
-                {
-                    response.ErrorCode = resEntUsuario.ErrorCode;
-                    response.SetError(resEntUsuario.Message);
-                }
-            }
-            catch (Exception ex)
-            {
-                response.ErrorCode = metodo.iCodigoError;
-                response.SetError(ex.Message);
-
-                _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(Guid uIdUsuario, string sToken): {ex.Message}", uIdUsuario, sToken, ex, response));
-            }
-            return response;
-        }
-
         public async Task<IMDResponse<dynamic>> BDescargaImagenPerfil(Guid uIdUsuario)
         {
             IMDResponse<dynamic> response = new IMDResponse<dynamic>();
@@ -3100,44 +2972,7 @@ namespace AppMonederoCommand.Business.BusUsuarios
             return response;
         }
 
-        [IMDMetodo(67823464916998, 67823464916221)]
-        public async Task<IMDResponse<EntUsuario>> BGetByMonedero(Guid uIdMonedero, string? sIdAplicacion = null)
-        {
-            IMDResponse<EntUsuario> response = new IMDResponse<EntUsuario>();
-            IMDMetodo metodo = MethodBase.GetCurrentMethod()!.GetIMDMetodo();
-            _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo}(Guid uIdMonedero)", uIdMonedero));
-
-            try
-            {
-                int iDispositivos = int.Parse(_busParametros.BObtener("APP_DISPOSITIVOS_NOTIFICA").Result.Result.sValor ?? "1");
-                response = await _datUsuario.DGetByMonedero(uIdMonedero);
-                if (response.HasError)
-                {
-                    //Se buscan en las tarjetas el monedero, para obtener el usuario...
-                    var tarjetaUsuario = await _busTarjetaUsuario.BGetTarjetaByIdMonedero(uIdMonedero);
-                    if (!tarjetaUsuario.HasError)
-                    {
-                        response = await BGet(tarjetaUsuario.Result.uIdUsuario);
-                    }
-                }
-
-                if (!response.HasError)
-                {
-                    var firebaseToken = await BObtenerFireBaseToken(response.Result.uIdUsuario, iDispositivos, sIdAplicacion);//Se agrega que se notifique a los ultimo 1 dispositivo conectado, de enviar el sIdAplicacion para que se pueda obtener a notificar correctamente, si no se le enviara al ultimo conectado
-                    if (!firebaseToken.HasError)
-                    {
-                        response.Result.entFirebaseTokens = firebaseToken.Result;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                response.ErrorCode = metodo.iCodigoError;
-                response.SetError(ex.Message);
-                _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo}(Guid uIdMonedero): {ex.Message}", uIdMonedero, ex, response));
-            }
-            return response;
-        }
+       
 
         [IMDMetodo(67823465411170, 67823465410393)]
         public async Task<IMDResponse<EntUsuario>> BValidaMonederoUsuario(Guid uIdUsuario)

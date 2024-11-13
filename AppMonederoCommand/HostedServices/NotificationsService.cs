@@ -11,7 +11,6 @@ namespace AppMonederoCommand.Api.HostedServices
         private IBusParametros _busParametros;
         private IBusTarjetas _busTarjetas;
         private IServiceProvider _serviceProvider;
-        private readonly IDatTarjetaUsuario _datTarjetasUsuario;
         public bool IsConnected { get; internal set; }
         private bool hasSubscribed = false;
         public bool IsEnabled { get; internal set; }
@@ -165,7 +164,6 @@ namespace AppMonederoCommand.Api.HostedServices
 
                         _logger.LogInformation($"Rabbit Events {x.Content}");
                         IDatMonedero _datEstadoCuentas = scope.ServiceProvider.GetRequiredService<IDatMonedero>();
-                        IDatTarjetaUsuario datTarjetaUsuario = scope.ServiceProvider.GetRequiredService<IDatTarjetaUsuario>();
 
                         var dbmodelEdoCuenta = await _datEstadoCuentas.DGetByIdMonedero(x.Content.Movimientos.IdMonedero);
                         _logger.LogInformation($"Rabbit Events get {dbmodelEdoCuenta}");
@@ -182,7 +180,6 @@ namespace AppMonederoCommand.Api.HostedServices
 
                         await _datEstadoCuentas.DUpdate(dbmodelEdoCuenta.Result);
 
-                        await _datTarjetasUsuario.DUpdateSaldo(x.Content.Movimientos.IdMonedero, dbmodelEdoCuenta.Result.dSaldo);
 
                        
                      }

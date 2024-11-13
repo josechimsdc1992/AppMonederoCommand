@@ -11,7 +11,6 @@
 */
 public interface IBusMonedero
 {
-    Task<IMDResponse<EntSaldo>> BGetSaldo(Guid uIdMonedero, string token, string? NumeroTarjeta, Guid? uIdUsuario, string? sIdAplicacion = null);
     Task<(IMDResponse<bool>, IMDResponse<AbonarSaldo>)> BAbonar(EntAbonar entAbonar, string token);
     Task<(IMDResponse<bool>, IMDResponse<TraspasoSaldoRequestModel>)> BTransferirSaldo(EntTransferirSaldo entTransferirSaldo, string token);
     Task<IMDResponse<dynamic>> BActualizaMonedero(EntRequestHTTPActualizaMonedero reqActualizaMonedero, string token);

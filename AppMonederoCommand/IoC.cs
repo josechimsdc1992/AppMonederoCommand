@@ -27,10 +27,6 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IBusTarjetas, BusTarjeta>();
             #endregion
 
-            #region Tarjetas
-            services.AddScoped<IBusTarjetaUsuario, BusTarjetaUsuario>();
-            services.AddScoped<IDatTarjetaUsuario, DatTarjetaUsuario>();
-            #endregion
 
 
             #region Peticiones HTTP

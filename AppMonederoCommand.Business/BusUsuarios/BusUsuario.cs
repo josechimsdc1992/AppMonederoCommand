@@ -1,4 +1,5 @@
-﻿using AppMonederoCommand.Entities.Usuarios;
+﻿using AppMonederoCommand.Entities.Config;
+using AppMonederoCommand.Entities.Usuarios;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Newtonsoft.Json;
 
@@ -28,13 +29,15 @@ namespace AppMonederoCommand.Business.BusUsuarios
         //Azure Blob Storage
         private readonly IServAzureBlobStorage _servAzureBlobStorage;
         private readonly string _errorCodeSesion = Environment.GetEnvironmentVariable("ERROR_CODE_SESION") ?? "";
+        private readonly IMDParametroConfig _IMDParametroConfig;
 
         public BusUsuario(ILogger<BusUsuario> logger, IDatUsuario datUusario,
             IServiceProvider serviceProvider, ExchangeConfig exchangeConfig, //Se agrega para crear poder enviar publicación al bus
             IBusJwToken busJwToken, IBusParametros busParametros,
             IDatUsuarioActualizaTelefono datUsuarioActualizaTelefono,
             IAuthService auth, IServGenerico servGenerico, IServAzureBlobStorage servAzureBlobStorage,
-            IBusMonedero busMonedero, IBusLenguaje busLenguaje, IBusTarjetaUsuario busTarjetaUsuario)
+            IBusMonedero busMonedero, IBusLenguaje busLenguaje, IBusTarjetaUsuario busTarjetaUsuario,
+            IMDParametroConfig iMDParametroConfig)
         {
             this._logger = logger;
             this._datUsuario = datUusario;
@@ -51,6 +54,7 @@ namespace AppMonederoCommand.Business.BusUsuarios
             _busMonedero = busMonedero;
             _busLenguaje = busLenguaje;
             _busTarjetaUsuario = busTarjetaUsuario;
+            _IMDParametroConfig = iMDParametroConfig;
         }
 
         #region Métodos Service Default  
@@ -5344,7 +5348,7 @@ namespace AppMonederoCommand.Business.BusUsuarios
                         .Replace("{TD}", tipoDestino);
 
 
-                    bool enviar = bool.Parse(_busParametros.BObtener("APP_VALIDACION_TRASPASO_MAIL").Result.Result.sValor ?? "false");
+                    bool enviar = _IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_MAIL;
                     if (enviar)
                     {
                         #region Notificacion email
@@ -5367,8 +5371,8 @@ namespace AppMonederoCommand.Business.BusUsuarios
                             plantilla = plantilla.Replace("{Folio}", serie + "-" + traspasoSaldoRequestModel.folioMov.ToString());
                             plantilla = plantilla.Replace("{Fecha}", traspasoSaldoRequestModel.FechaOperacion.ToString("dd/MM/yyyy HH:mm"));
 
-                            string telefonoAtencionClientes = _busParametros.BObtener("ATI_ATENCION_CLIENTES_TELEFONO").Result.Result.sValor;
-                            string emailAtencionClientes = _busParametros.BObtener("ATI_ATENCION_CLIENTES_EMAIL").Result.Result.sValor;
+                            string telefonoAtencionClientes = _IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_TELEFONO;
+                            string emailAtencionClientes = _IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_EMAIL;
 
                             plantilla = plantilla.Replace("{Importante}", Menssages.HtmlImportantLabel.Replace("{telefono}", telefonoAtencionClientes).Replace("{email}", emailAtencionClientes));
 
@@ -5394,7 +5398,7 @@ namespace AppMonederoCommand.Business.BusUsuarios
                         #endregion
                     }
 
-                    enviar = bool.Parse(_busParametros.BObtener("APP_VALIDACION_TRASPASO_SMS").Result.Result.sValor ?? "false");
+                    enviar = _IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_SMS;
                     if (enviar)
                     {
                         #region Notificacion SMS
@@ -5412,10 +5416,10 @@ namespace AppMonederoCommand.Business.BusUsuarios
                         #endregion
                     }
 
-                    enviar = bool.Parse(_busParametros.BObtener("APP_VALIDACION_TRASPASO_PUSH").Result.Result.sValor ?? "false");
+                    enviar = _IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_PUSH;
                     if (enviar)
                     {
-                        int iDispositivos = int.Parse(_busParametros.BObtener("APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH").Result.Result.sValor ?? "2");
+                        int iDispositivos = _IMDParametroConfig.PARAMETRO_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH;
                         #region Notificacion PUSH
                         var resFirebaseToken = await BObtenerFireBaseToken(usuario.Result.uIdUsuario, iDispositivos);
                         if (resFirebaseToken.Result != null)

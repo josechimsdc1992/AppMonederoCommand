@@ -1,4 +1,5 @@
-﻿using AppMonederoCommand.Entities.Config;
+﻿using AppMonederoCommand.Business.Interfaces.Parametro;
+using AppMonederoCommand.Entities.Config;
 using IMD.Utils;
 using System.Collections.Generic;
 
@@ -180,13 +181,26 @@ namespace AppMonederoCommand.Business.Parametro
             string claveAPP_ABONAR_DESCRIPCION = nameof(_IMDParametroConfig.PARAMETRO_APP_ABONAR_DESCRIPCION).Replace("PARAMETRO_", "");
             string claveAPP_ABONAR_GUID = nameof(_IMDParametroConfig.PARAMETRO_APP_ABONAR_GUID).Replace("PARAMETRO_", "");
             string claveAPP_APP_TRANSFERIR_DESCRIPCION = nameof(_IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_DESCRIPCION).Replace("PARAMETRO_", "");
-            string claveAPP_PP_TRANSFERIR_GUID = nameof(_IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_GUID).Replace("PARAMETRO_", "");
+            string claveAPP_APP_TRANSFERIR_GUID = nameof(_IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_GUID).Replace("PARAMETRO_", "");
+            string claveAPP_VALIDACION_TRASPASO_MAIL = nameof(_IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_MAIL).Replace("PARAMETRO_", "");
+            string claveAPP_ATI_ATENCION_CLIENTES_TELEFONO = nameof(_IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_TELEFONO).Replace("PARAMETRO_", "");
+            string claveAPP_ATI_ATENCION_CLIENTES_EMAIL = nameof(_IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_EMAIL).Replace("PARAMETRO_", "");
+            string claveAPP_APP_VALIDACION_TRASPASO_SMS = nameof(_IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_SMS).Replace("PARAMETRO_", "");
+            string claveAPP_APP_VALIDACION_TRASPASO_PUSH = nameof(_IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_PUSH).Replace("PARAMETRO_", "");
+            string claveAPP_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH = nameof(_IMDParametroConfig.PARAMETRO_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH).Replace("PARAMETRO_", "");
 
-            List<string> listClaves = new List<string>();
-            listClaves.Add(claveAPP_PP_TRANSFERIR_GUID);
-            listClaves.Add(claveAPP_ABONAR_GUID);
-            listClaves.Add(claveAPP_APP_TRANSFERIR_DESCRIPCION);
+        List<string> listClaves = new List<string>();
             listClaves.Add(claveAPP_ABONAR_DESCRIPCION);
+            listClaves.Add(claveAPP_ABONAR_GUID);
+            listClaves.Add(claveAPP_APP_TRANSFERIR_GUID);
+            listClaves.Add(claveAPP_APP_TRANSFERIR_DESCRIPCION);
+            listClaves.Add(claveAPP_VALIDACION_TRASPASO_MAIL);
+            listClaves.Add(claveAPP_ATI_ATENCION_CLIENTES_TELEFONO);
+            listClaves.Add(claveAPP_ATI_ATENCION_CLIENTES_EMAIL);
+            listClaves.Add(claveAPP_APP_VALIDACION_TRASPASO_SMS);
+            listClaves.Add(claveAPP_APP_VALIDACION_TRASPASO_PUSH);
+            listClaves.Add(claveAPP_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH);
+
             IMDResponse<List<EntParametros>> IMDListResponse = await BObtenerByClaves(listClaves);
             foreach (EntParametros entRead in IMDListResponse.Result)
             {
@@ -199,7 +213,14 @@ namespace AppMonederoCommand.Business.Parametro
             string claveAPP_ABONAR_DESCRIPCION = nameof(_IMDParametroConfig.PARAMETRO_APP_ABONAR_DESCRIPCION).Replace("PARAMETRO_", "");
             string claveAPP_ABONAR_GUID = nameof(_IMDParametroConfig.PARAMETRO_APP_ABONAR_GUID).Replace("PARAMETRO_", "");
             string claveAPP_APP_TRANSFERIR_DESCRIPCION = nameof(_IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_DESCRIPCION).Replace("PARAMETRO_", "");
-            string claveAPP_PP_TRANSFERIR_GUID = nameof(_IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_GUID).Replace("PARAMETRO_", "");
+            string claveAPP_APP_TRANSFERIR_GUID = nameof(_IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_GUID).Replace("PARAMETRO_", "");
+            string claveAPP_VALIDACION_TRASPASO_MAIL = nameof(_IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_MAIL).Replace("PARAMETRO_", "");
+            string claveAPP_ATI_ATENCION_CLIENTES_TELEFONO = nameof(_IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_TELEFONO).Replace("PARAMETRO_", "");
+            string claveAPP_ATI_ATENCION_CLIENTES_EMAIL = nameof(_IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_EMAIL).Replace("PARAMETRO_", "");
+            string claveAPP_APP_VALIDACION_TRASPASO_SMS = nameof(_IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_SMS).Replace("PARAMETRO_", "");
+            string claveAPP_APP_VALIDACION_TRASPASO_PUSH = nameof(_IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_PUSH).Replace("PARAMETRO_", "");
+            string claveAPP_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH = nameof(_IMDParametroConfig.PARAMETRO_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH).Replace("PARAMETRO_", "");
+
 
             _logger.LogInformation($"SetConfiguracionModulo:{sClave}-{sValor}");
 
@@ -239,11 +260,11 @@ namespace AppMonederoCommand.Business.Parametro
                 }
 
             }
-            if (sClave == claveAPP_ABONAR_DESCRIPCION)
+            if (sClave == claveAPP_APP_TRANSFERIR_GUID)
             {
                 try
                 {
-                    _IMDParametroConfig.PARAMETRO_APP_ABONAR_DESCRIPCION = sValor;
+                    _IMDParametroConfig.PARAMETRO_APP_TRANSFERIR_GUID = sValor;
                 }
                 catch (Exception ex)
                 {
@@ -251,7 +272,79 @@ namespace AppMonederoCommand.Business.Parametro
                 }
 
             }
-           
+            if (sClave == claveAPP_VALIDACION_TRASPASO_MAIL)
+            {
+                try
+                {
+                    _IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_MAIL = bool.Parse(sValor);
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+            if (sClave == claveAPP_ATI_ATENCION_CLIENTES_TELEFONO)
+            {
+                try
+                {
+                    _IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_TELEFONO = sValor;
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+            if (sClave == claveAPP_ATI_ATENCION_CLIENTES_EMAIL)
+            {
+                try
+                {
+                    _IMDParametroConfig.PARAMETRO_ATI_ATENCION_CLIENTES_EMAIL = sValor;
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+            if (sClave == claveAPP_APP_VALIDACION_TRASPASO_SMS)
+            {
+                try
+                {
+                    _IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_SMS = bool.Parse(sValor);
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+            if (sClave == claveAPP_APP_VALIDACION_TRASPASO_PUSH)
+            {
+                try
+                {
+                    _IMDParametroConfig.PARAMETRO_APP_VALIDACION_TRASPASO_PUSH = bool.Parse(sValor);
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+            if (sClave == claveAPP_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH)
+            {
+                try
+                {
+                    _IMDParametroConfig.PARAMETRO_APP_DISPOSITIVOS_NOTIFICA_TRASPASO_PUSH = int.Parse(sValor ?? "2");
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+
         }
         public async void SetListadosAdicionales()
         {

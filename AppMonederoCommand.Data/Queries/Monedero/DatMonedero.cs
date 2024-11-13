@@ -45,27 +45,6 @@
             return response;
         }
 
-        public async Task<IMDResponse<List<EntMovimientos>>> DConsultarMovimientos(EntBusquedaMovimientos filtros, Guid uIdMonedero)
-        {
-            IMDResponse<List<EntMovimientos>> response = new IMDResponse<List<EntMovimientos>>();
-
-            string metodo = nameof(this.DConsultarMovimientos);
-            _logger.LogInformation(IMDSerializer.Serialize(67823462179627, $"Inicia {metodo}(EntBusquedaMovimientos filtros, Guid uIdMonedero)", filtros, uIdMonedero));
-
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                response.ErrorCode = 67823462180404;
-                response.SetError(ex);
-
-                _logger.LogError(IMDSerializer.Serialize(67823462180404, $"Error en {metodo}(EntBusquedaMovimientos filtros, Guid uIdMonedero): {ex.Message}", filtros, uIdMonedero, ex, response));
-            }
-            return response;
-        }
-
 
         public async Task<IMDResponse<decimal>> DSaveMovimiento(EntTransferirSaldo item)
         {

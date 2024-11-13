@@ -13,7 +13,6 @@
     public interface IDatMonedero
     {
         Task<IMDResponse<decimal>> DSaldo(Guid uIdMonedero);
-        Task<IMDResponse<List<EntMovimientos>>> DConsultarMovimientos(EntBusquedaMovimientos filtros, Guid uIdMonedero);
         Task<IMDResponse<decimal>> DSaveMovimiento(EntTransferirSaldo item);
         Task<IMDResponse<AppMonederoCommand.Entities.Monedero.EntMonedero>> DMonedero(Guid uIdMonedero);
         Task<IMDResponse<bool>> DMonederoCreacion(EntCreateReplicaMonederos entMonederoNotificacion);

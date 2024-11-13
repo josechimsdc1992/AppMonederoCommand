@@ -65,14 +65,7 @@
         MotivosBorrado500 = 2015,
         #endregion
 
-        #region Tickets
-        [Description("Tickets.Creacion")]
-        TicketCreacion = 3010,
-        [Description("Tickets.Modificacion")]
-        TicketModificacion = 3011,
-        [Description("Ticket.Usado.App")]
-        TicketUsadoApp = 3012,
-        #endregion
+        
 
         #region FirebaseToken
         [Description("FirebaseToken.Creacion")]
@@ -260,5 +253,12 @@
 
         [Description("Credencializacion.Tarjetas.Creada")]
         TarjetasCreacion = 2456,
+
+        [Description("app.usuarios.create")]
+        UsuariosCreate = 2500,
+        [Description("app.usuarios.update")]
+        UsuariosUpdate = 2501,
+        [Description("app.usuarios.delete")]
+        UsuariosDelete = 2502,
     }
 }

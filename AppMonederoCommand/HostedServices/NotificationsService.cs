@@ -990,6 +990,40 @@ namespace AppMonederoCommand.Api.HostedServices
                         _logger.LogError($"{ServiceName} : {ex.Message}");
                     }
                 });
+
+                #region Usuarios
+                _rabbitNotifications.ReceiveAsync<QueueMessage<EntUsuario>>(RoutingKeys.UsuariosCreate.GetDescription(), _exchangeConfig, async x =>
+                {
+                    _logger.LogInformation($"MessageId: {x.uMessageId}, SourceSystem: {x.sSourceSystem}, Timestamp: {x.dtTimestamp}");
+                    using (var scope = _serviceScopeFactory.CreateScope())
+                    {
+                        IDatUsuario _datUsuario = scope.ServiceProvider.GetRequiredService<IDatUsuario>();
+
+                        await _datUsuario.DSave(x.Content);
+                    };
+                });
+
+                _rabbitNotifications.ReceiveAsync<QueueMessage<EntEliminarUsuario>>(RoutingKeys.UsuariosDelete.GetDescription(), _exchangeConfig, async x =>
+                {
+                    _logger.LogInformation($"MessageId: {x.uMessageId}, SourceSystem: {x.sSourceSystem}, Timestamp: {x.dtTimestamp}");
+                    using (var scope = _serviceScopeFactory.CreateScope())
+                    {
+                        IDatUsuario _datUsuario = scope.ServiceProvider.GetRequiredService<IDatUsuario>();
+                        await _datUsuario.DEliminarUsuario(x.Content);
+                    };
+                });
+
+                _rabbitNotifications.ReceiveAsync<QueueMessage<EntUsuario>>(RoutingKeys.UsuariosUpdate.GetDescription(), _exchangeConfig, async x =>
+                {
+                    _logger.LogInformation($"MessageId: {x.uMessageId}, SourceSystem: {x.sSourceSystem}, Timestamp: {x.dtTimestamp}");
+                    using (var scope = _serviceScopeFactory.CreateScope())
+                    {
+                        IDatUsuario _datUsuario = scope.ServiceProvider.GetRequiredService<IDatUsuario>();
+
+                        await _datUsuario.DUpdateUsuario(x.Content);
+                    };
+                });
+                #endregion
             }
             catch (Exception ex)
             {

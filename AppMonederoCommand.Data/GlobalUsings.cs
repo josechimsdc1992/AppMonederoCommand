@@ -11,7 +11,6 @@ global using AppMonederoCommand.Data.Entities.Catalogos;
 global using AppMonederoCommand.Data.Entities.FirebaseTokens;
 global using AppMonederoCommand.Data.Entities.Monedero;
 global using AppMonederoCommand.Data.Entities.Parametro;
-global using AppMonederoCommand.Data.Entities.Tarjetas;
 global using AppMonederoCommand.Data.Entities.TiposTarifa;
 global using AppMonederoCommand.Data.Entities.Usuarios;
 global using AppMonederoCommand.Data.Mapping;

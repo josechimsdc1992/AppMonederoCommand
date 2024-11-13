@@ -57,7 +57,6 @@ global using AppMonederoCommand.Entities.Usuarios.EliminarCuenta;
 global using AppMonederoCommand.Entities.Usuarios.FirebaseToken;
 global using AppMonederoCommand.Entities.Usuarios.JWTEntities;
 global using AppMonederoCommand.Entities.Usuarios.Login;
-global using AppMonederoCommand.Entities.Usuarios.RecuperarCuenta;
 global using AppMonederoCommand.Entities.Usuarios.ReenviarCodigo;
 global using AppMonederoCommand.Services;
 global using AppMonederoCommand.Services.AzureBlobStorage;

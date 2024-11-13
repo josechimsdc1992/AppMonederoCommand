@@ -17,9 +17,6 @@ public class DBMappingProfile : Profile
     public DBMappingProfile()
     {
 
-        CreateMap<EntUsuarioActualizaTelefonoRequest, UsuarioActualizaTelefono>();
-
-        CreateMap<UsuarioActualizaTelefono, EntUsuarioActualizaTelefono>();
 
         CreateMap<FirebaseToken, EntFirebaseToken>();
 

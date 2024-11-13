@@ -21,8 +21,6 @@ public partial class TransporteContext : DbContext
     public virtual DbSet<Parametros> Parametros { get; set; }
 
     public virtual DbSet<TarjetaUsuario> TarjetaUsuario { get; set; }
-
-    public virtual DbSet<UsuarioActualizaTelefono> UsuarioActualizaTelefono { get; set; }
     public virtual DbSet<EstadoDeCuenta> EstadoDeCuenta { get; set; }
     public virtual DbSet<TiposTarifa> TiposTarifa { get; set; }
     public virtual DbSet<Motivo> Motivo { get; set; }
@@ -37,7 +35,6 @@ public partial class TransporteContext : DbContext
         modelBuilder.ApplyConfiguration(new MapParametros());
         modelBuilder.ApplyConfiguration(new MapFirebaseToken());
         modelBuilder.ApplyConfiguration(new MapTarjetaUsuario());
-        modelBuilder.ApplyConfiguration(new MapUsuarioActualizaTelefono());
         modelBuilder.ApplyConfiguration(new MapEstadoDeCuenta());
         modelBuilder.ApplyConfiguration(new MapTiposTarifa());
         modelBuilder.ApplyConfiguration(new MapMotivo());

@@ -12,7 +12,6 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IBusParametros, BusParametros>();
             services.AddScoped<IDatUsuario, DatUsuario>();
             services.AddScoped<IDatParametros, DatParametros>();
-            services.AddScoped<IDatUsuarioActualizaTelefono, DatUsuarioActualizaTelefono>();
             services.AddScoped<IBusUsuariosWeb, BusUsuariosWeb>();
             #endregion
 

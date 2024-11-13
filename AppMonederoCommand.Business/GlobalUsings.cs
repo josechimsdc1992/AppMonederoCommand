@@ -46,7 +46,6 @@ global using AppMonederoCommand.Entities.Usuarios.Http.Request;
 global using AppMonederoCommand.Entities.Usuarios.Http.Response;
 global using AppMonederoCommand.Entities.Usuarios.JWTEntities;
 global using AppMonederoCommand.Entities.Usuarios.Login;
-global using AppMonederoCommand.Entities.Usuarios.RecuperarCuenta;
 global using AppMonederoCommand.Entities.Usuarios.ReenviarCodigo;
 global using AppMonederoCommand.Entities.Usuarios.RefreshToken;
 global using AppMonederoCommand.Services.Enums;

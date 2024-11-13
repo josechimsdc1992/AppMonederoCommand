@@ -40,7 +40,6 @@ global using AppMonederoCommand.Entities.Usuarios.Contrasena;
 global using AppMonederoCommand.Entities.Usuarios.FirebaseToken;
 global using AppMonederoCommand.Entities.Usuarios.JWTEntities;
 global using AppMonederoCommand.Entities.Usuarios.Login;
-global using AppMonederoCommand.Entities.Usuarios.RecuperarCuenta;
 global using AppMonederoCommand.Entities.Usuarios.ReenviarCodigo;
 global using AppMonederoCommand.Utils;
 global using AutoMapper;

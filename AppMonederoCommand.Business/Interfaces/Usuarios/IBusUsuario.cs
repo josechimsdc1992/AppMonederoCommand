@@ -35,9 +35,6 @@
         Task<IMDResponse<EntUsuario>> BUpdateUsuario(EntUpdateUsarioActivo usuarioBaja);
         Task<IMDResponse<bool>> BEliminarUsuario(Guid uIdUsuario);
         Task<IMDResponse<EntUsuario>> BGetByCorreo(string Email);
-        Task<IMDResponse<EntUsuarioResponse>> BUpdateUsuarioAdicional(EntUsuarioActualizaTelefonoRequest entUsuario, Guid uIdUsuario);
-        Task<IMDResponse<EntUsuarioResponse>> BReenviarCodigoActualizarTelefono(Guid uIdUsuario);
-        Task<IMDResponse<dynamic>> BVerificaCodigoActualizarTelefono(EntCodigoVerificacion codigo, Guid uIdUsuario);
         Task<IMDResponse<dynamic>> BGuardaImagenPerfil(EntRequestBlobStorage requestImagenPerfil);
         Task<IMDResponse<EntUsuarioTarifa>> BUsuarioTarifa(Guid uIdUsuario, string sToken, string sIdAplicacion);
         Task<IMDResponse<dynamic>> BDescargaImagenPerfil(Guid uIdUsuario);

@@ -132,5 +132,29 @@ namespace AppMonederoCommand.Data.Queries.Tarjetas
 
             return response;
         }
+
+        public async Task<IMDResponse<EntReadTarjetas>> DGetByuIdMonedero(Guid uidMonedero)
+        {
+            IMDResponse<EntReadTarjetas> response = new();
+            IMDMetodo metodo = MethodBase.GetCurrentMethod().GetIMDMetodo();
+            _logger.LogInformation(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Inicia {metodo.sNombre}({metodo.sParametros})", uidMonedero));
+
+            try
+            {
+                await BulkOperations.DesconectarEntidadesAsync(_DbContext);
+
+                var query = _DbContext.Tarjetas.AsNoTracking().FirstOrDefault(u => u.uIdMonedero == uidMonedero);
+                var result = _mapper.Map<EntReadTarjetas>(query);
+                response.SetSuccess(result);
+            }
+            catch (Exception ex)
+            {
+                response.ErrorCode = metodo.iCodigoError;
+                response.SetError("Ocurrió un error inesperado");
+                _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoInformacion, $"Error en {metodo.sNombre}({metodo.sParametros}): {ex.Message}", uidMonedero, ex, response));
+            }
+
+            return response;
+        }
     }
 }

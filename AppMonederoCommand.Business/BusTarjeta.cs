@@ -118,6 +118,27 @@ namespace AppMonederoCommand.Business
             return response;
         }
 
+        public async Task<IMDResponse<EntReadTarjetas>> BGetByuIdMonedero(Guid uIdMonedero)
+        {
+            IMDResponse<EntReadTarjetas> response = new IMDResponse<EntReadTarjetas>();
+            string metodo = nameof(this.BGetAll);
+
+            try
+            {
+                var resData = await _datTarjetas.DGetByuIdMonedero(uIdMonedero);
+                response.SetSuccess(resData.Result);
+            }
+            catch (Exception ex)
+            {
+                response.ErrorCode = 40232026130522;
+                response.SetError(ex);
+                _logger.LogError(IMDSerializer.Serialize(20232026130522,
+                    $"Error en {metodo}(): {ex.Message}", ex, response));
+            }
+
+            return response;
+        }
+
         public async Task<IMDResponse<EntReadTarjetas>> BUpdate(EntReadTarjetas updateModel)
         {
             IMDResponse<EntReadTarjetas> response = new IMDResponse<EntReadTarjetas>();

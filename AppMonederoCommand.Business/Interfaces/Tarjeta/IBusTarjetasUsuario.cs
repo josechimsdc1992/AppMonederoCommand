@@ -12,10 +12,7 @@ namespace AppMonederoCommand.Business.Interfaces.Tarjeta;
 public interface IBusTarjetaUsuario
 {
     Task<IMDResponse<List<EntTarjetaUsuario>>> BTarjetas(Guid uIdUsuario, Guid uIdMonedero, string token, string? sIdAplicacion = null);
-    Task<IMDResponse<bool>> BVincularTarjeta(EntVincularTarjeta entVincularTarjeta, string token);
-    Task<IMDResponse<bool>> BDesvincularTarjeta(EntDesvincularTarjeta entDesvincularTarjeta);
-    Task<IMDResponse<EntTarjetaUsuario>> BGetTarjetaByID(Guid uIdUsuario, Guid uIdTarjeta);
-    Task<IMDResponse<EntOperacionesTarjetas>> BValidaTarjeta(string sNumeroTarjeta, string token);
+ 
     Task<IMDResponse<EntOperacionesTarjetas>> BValidaTarjetaV2(string sNumeroTarjeta, string token, int? iTipoTarjeta = null);
     Task<IMDResponse<EntOperacionesPermitidasTarjeta>> BValidaEstatusTarjeta(EntTarjetaRes tarjeta);
     Task<IMDResponse<EntOperacionesPermitidasTarjeta>> BValidaEstatusTarjeta(string sNumeroTarjeta, string token, int? iTipoTarjeta = null);

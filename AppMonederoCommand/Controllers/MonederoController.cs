@@ -23,16 +23,19 @@ public class MonederoController : ControllerBase
     private readonly IAuthService _authService;
     private readonly IBusLenguaje _busLenguaje;
     private readonly IBusUsuario _busUsuario;
-    private readonly IBusTarjetaUsuario _busTarjetaUsuario;
+    private readonly IBusTarjetas _busTarjeta;
 
-    public MonederoController(ILogger<MonederoController> logger, IBusMonedero busMonedero, IAuthService authService, IBusLenguaje busLenguaje, IBusUsuario busUsuario, IBusTarjetaUsuario busTarjetaUsuario)
+    public MonederoController(ILogger<MonederoController> logger, IBusMonedero busMonedero, 
+        IAuthService authService, IBusLenguaje busLenguaje, 
+        IBusUsuario busUsuario,
+        IBusTarjetas busTarjetas)
     {
         _logger = logger;
         _busMonedero = busMonedero;
         _authService = authService;
         _busLenguaje = busLenguaje;
         _busUsuario = busUsuario;
-        _busTarjetaUsuario = busTarjetaUsuario;
+        _busTarjeta= busTarjetas;
     }
 
   
@@ -96,10 +99,11 @@ public class MonederoController : ControllerBase
 
                     string sDestino = null, sOrigen = null;
 
-                    var tarjetaOrigen = _busTarjetaUsuario.BGetTarjetaByIdMonedero(entTransferirSaldo.uIdMonederoOrigen).Result;
-                    if (!tarjetaOrigen.HasError)
+
+                    IMDResponse<EntReadTarjetas> resTarjetaOrigen =await _busTarjeta.BGetByuIdMonedero(entTransferirSaldo.uIdMonederoOrigen);
+                    if (!resTarjetaOrigen.HasError)
                     {
-                        sOrigen = tarjetaOrigen.Result.sNumeroTarjeta + "-T";
+                        sOrigen = resTarjetaOrigen.Result.iNumeroTarjeta;
                     }
                     else
                     {
@@ -110,10 +114,10 @@ public class MonederoController : ControllerBase
                         }
                     }
 
-                    var tarjetaDestino = _busTarjetaUsuario.BGetTarjetaByIdMonedero(entTransferirSaldo.uIdMonederoDestino).Result;
-                    if (!tarjetaDestino.HasError)
+                    IMDResponse<EntReadTarjetas> resTarjetaDestino = await _busTarjeta.BGetByuIdMonedero(entTransferirSaldo.uIdMonederoDestino);
+                    if (!resTarjetaDestino.HasError)
                     {
-                        sDestino = tarjetaDestino.Result.sNumeroTarjeta + "-T";
+                        sDestino = resTarjetaDestino.Result.iNumeroTarjeta;
                     }
                     else
                     {

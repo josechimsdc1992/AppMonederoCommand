@@ -12,5 +12,6 @@ namespace AppMonederoCommand.Business.Interfaces.Tarjeta
     {
 
         Task<IMDResponse<EntReadTarjetas>> BGetByNumTarjeta(long plTarjeta);
+        Task<IMDResponse<EntReadTarjetas>> BGetByuIdMonedero(Guid uIdMonedero);
     }
 }

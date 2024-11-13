@@ -11,5 +11,6 @@ namespace AppMonederoCommand.Business.Repositories.Tarjetas
     public interface IDatTarjetas: IDatBase<EntReadTarjetas>
     {
         Task<IMDResponse<EntReadTarjetas>> DGetByNumTarjeta(long plTarjeta);
+        Task<IMDResponse<EntReadTarjetas>> DGetByuIdMonedero(Guid uidMonedero);
     }
 }

@@ -13,8 +13,6 @@
   */
     public interface IBusUsuario
     {
-        Task<IMDResponse<EntUsuarioResponse>> BCreateUsuario(EntCreateUsuario pCreateModel);
-        Task<IMDResponse<dynamic>> BIniciarSesion(EntLogin pUsuario);
         Task<IMDResponse<dynamic>> BIniciaSesionToken(EntRefreshTokenRequest pToken, string sIdAplicacion);
         Task<IMDResponse<dynamic>> BVerificaCodigo(EntCodigoVerificacion codigo);
         Task<IMDResponse<dynamic>> BReenviarCodigo(EntReenviaCodigo solicitud);
@@ -29,16 +27,11 @@
         Task<IMDResponse<bool>> BVerificaContrasena(string contrasena, string confirmaContrasena);
         Task<IMDResponse<string>> BValidaDatosCompletos(EntCreateUsuario pCreateModel);
         Task<IMDResponse<dynamic>> BGeneraTokenRecuperacion();
-        Task<IMDResponse<EntUsuario>> BUpdateUsuario(EntUpdateUsuario entUsuario);
-        Task<IMDResponse<EntUsuario>> BUpdateUsuario(EntUpdateUsuarioRedSocial creaUsarioRedSocialBaja);
-        Task<IMDResponse<EntUsuario>> BUpdateUsuario(EntUsuario nuevoUsuario);
-        Task<IMDResponse<EntUsuario>> BUpdateUsuario(EntUpdateUsarioActivo usuarioBaja);
         Task<IMDResponse<bool>> BEliminarUsuario(Guid uIdUsuario);
         Task<IMDResponse<EntUsuario>> BGetByCorreo(string Email);
         Task<IMDResponse<dynamic>> BGuardaImagenPerfil(EntRequestBlobStorage requestImagenPerfil);
         Task<IMDResponse<dynamic>> BDescargaImagenPerfil(Guid uIdUsuario);
         Task<IMDResponse<dynamic>> BEliminaImagenPerfil(Guid uIdUsuario);
-        Task<IMDResponse<dynamic>> BActualizaDatosMonedero(EntUsuario datosUsuario);
         Task<IMDResponse<EntUsuario>> BGet(Guid uIdUsuario);
         Task<IMDResponse<bool>> EnviarCorreoValidacionAbono(EntBusMessCorreoValidacionAbono entBusMessCorreoValidacionAbono);
         Task<IMDResponse<bool>> EnviarSmsValidacionAbono(EntBusMessSmsValidacionAbono entBusMessSMSValidacionAbono);

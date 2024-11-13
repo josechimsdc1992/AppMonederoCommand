@@ -19,9 +19,7 @@
         Task<IMDResponse<dynamic>> BVerificaCodigo(EntCodigoVerificacion codigo);
         Task<IMDResponse<dynamic>> BReenviarCodigo(EntReenviaCodigo solicitud);
         Task<IMDResponse<dynamic>> BCambiaContrasena(Guid uIdUsuario, EntNuevaContrasena password);
-        Task<IMDResponse<dynamic>> BEnviaCorreoRecuperacion(EntRecuperaCuenta rescuperaCuenta);
         Task<IMDResponse<bool>> BGuardaFireBaseToken(Guid uIdUsuario, string sFcmToken, string sInfoAppOS, string? sIdAplicacion);
-        Task<IMDResponse<dynamic>> BRecuperaCambiaContrasena(string sCorreo, string sToken, EntNuevaContrasena contrasena);
         Task<IMDResponse<bool>> BValidaEmail(string pEmail);
         Task<IMDResponse<bool>> BExisteCorreo(string pEmail);
         Task<IMDResponse<bool>> BExisteTelefono(string pTelefono);
@@ -36,7 +34,6 @@
         Task<IMDResponse<EntUsuario>> BUpdateUsuario(EntUsuario nuevoUsuario);
         Task<IMDResponse<EntUsuario>> BUpdateUsuario(EntUpdateUsarioActivo usuarioBaja);
         Task<IMDResponse<bool>> BEliminarUsuario(Guid uIdUsuario);
-        Task<IMDResponse<EntHistorialRecuperacionToken>> BValidarTokenRecuperacion(string correo, string token);
         Task<IMDResponse<EntUsuario>> BGetByCorreo(string Email);
         Task<IMDResponse<EntUsuarioResponse>> BUpdateUsuarioAdicional(EntUsuarioActualizaTelefonoRequest entUsuario, Guid uIdUsuario);
         Task<IMDResponse<EntUsuarioResponse>> BReenviarCodigoActualizarTelefono(Guid uIdUsuario);

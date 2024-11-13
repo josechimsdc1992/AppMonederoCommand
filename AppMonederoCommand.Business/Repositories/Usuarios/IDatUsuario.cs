@@ -16,7 +16,6 @@
     {
         Task<IMDResponse<EntUsuario>> DSave(EntUsuario nuevoUsuario);
         Task<IMDResponse<bool>> DSaveFirebaseToken(EntFirebaseToken firebaseToken, EntUsuario entUsuario);
-        Task<IMDResponse<bool>> DSaveTokenRecuperacion(EntHistorialRecuperacionToken historialToken);
         Task<IMDResponse<EntUsuario>> DGet(Guid uIdUsuario);
         Task<IMDResponse<EntUsuario>> DGetCorreo(string pEmail);
         Task<IMDResponse<EntUsuario>> DGetByRedSocial(string sIdRedSocial, string sRedSocial);
@@ -30,7 +29,6 @@
         Task<IMDResponse<EntUsuario>> DUpdateUsuarioVerificado(EntCodigoVerificacion codigo);
         Task<IMDResponse<bool>> DUpdateCodigoVerificacion(EntReenviaCodigo solicitud, string codgioEncrypt);
         Task<IMDResponse<bool>> DUpdateContrasena(Guid uIdUsuario, EntNuevaContrasena contrasena);
-        Task<IMDResponse<bool>> DUpdateHistorialRecuperacionToken(Guid uIdUsuario, string token);
         Task<IMDResponse<bool>> DUpdateContrasena(Guid uIdUsuario, EntNuevaContrasena contrasena, string token);
         Task<IMDResponse<bool>> DUpdateMonederoUsuario(Guid uIdUsuario, Guid uIdMonedero);
         Task<IMDResponse<bool>> DUpdateUsuario(EntUpdateUsuario entUsuario);
@@ -41,8 +39,6 @@
         Task<IMDResponse<EntUsuario>> DGetExisteCuenta(string correo);
         Task<IMDResponse<EntUsuario>> DGetExisteCuenta(string correo, bool isSocialNetwork);
         Task<IMDResponse<bool>> DEliminarUsuario(EntEliminarUsuario entUsuario);
-        Task<IMDResponse<bool>> DGetTokenValido(Guid uIdUsuario, string sCorreo, string sToken);
-        Task<IMDResponse<EntHistorialRecuperacionToken>> DGetHistorialTokenRecuperarCuenta(string correo, string token);
         Task<IMDResponse<bool>> DUpdateContrasenaTemporal(Guid uIdUsuario, string contrasenaAleatoria);
 
         Task<IMDResponse<EntUsuario>> DGetByAppleId(string sAppleId);

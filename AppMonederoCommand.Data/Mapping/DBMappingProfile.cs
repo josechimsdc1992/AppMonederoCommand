@@ -17,10 +17,6 @@ public class DBMappingProfile : Profile
     public DBMappingProfile()
     {
 
-        CreateMap<HistorialRecuperarCuenta, EntHistorialRecuperarCuenta>();
-
-        CreateMap<EntHistorialRecuperarCuenta, HistorialRecuperarCuenta>();
-
         CreateMap<EntUsuarioActualizaTelefonoRequest, UsuarioActualizaTelefono>();
 
         CreateMap<UsuarioActualizaTelefono, EntUsuarioActualizaTelefono>();

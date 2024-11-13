@@ -1,8 +1,6 @@
 ﻿using BusMapper = IMD.Utils.IMDAutoMapper<AppMonederoCommand.Data.Entities.Usuarios.Usuario, AppMonederoCommand.Entities.Usuarios.EntUsuario>;
-using BusRecuperacionToken = IMD.Utils.IMDAutoMapper<AppMonederoCommand.Data.Entities.RecuperacionTokens.HistorialRecuperacionToken, AppMonederoCommand.Entities.Usuarios.RecuperarCuenta.EntHistorialRecuperacionToken>;
 using DbMapper = IMD.Utils.IMDAutoMapper<AppMonederoCommand.Entities.Usuarios.EntUsuario, AppMonederoCommand.Data.Entities.Usuarios.Usuario>;
 using DbMapperFirebase = IMD.Utils.IMDAutoMapper<AppMonederoCommand.Entities.Usuarios.FirebaseToken.EntFirebaseToken, AppMonederoCommand.Data.Entities.FirebaseTokens.FirebaseToken>;
-using DbRecuperacionToken = IMD.Utils.IMDAutoMapper<AppMonederoCommand.Entities.Usuarios.RecuperarCuenta.EntHistorialRecuperacionToken, AppMonederoCommand.Data.Entities.RecuperacionTokens.HistorialRecuperacionToken>;
 
 namespace AppMonederoCommand.Data.Queries.Usuarios
 {
@@ -190,46 +188,6 @@ namespace AppMonederoCommand.Data.Queries.Usuarios
                 response.ErrorCode = 500;
                 response.SetError(ex);
                 _logger.LogError(IMDSerializer.Serialize(metodo.iCodigoError, $"Error en {metodo.sNombre}{metodo.sParametros}: {ex.Message}", firebaseToken, entUsuario, ex, response));
-            }
-            return response;
-        }
-
-        public async Task<IMDResponse<bool>> DSaveTokenRecuperacion(EntHistorialRecuperacionToken historialToken)
-        {
-            IMDResponse<bool> response = new IMDResponse<bool>();
-
-            string metodo = nameof(this.DSaveTokenRecuperacion);
-            _logger.LogInformation(IMDSerializer.Serialize(67823462700217, $"Inicia {metodo}(EntHistorialRecuperacionToken historialToken)", historialToken));
-
-            try
-            {
-                var queryExisteActivo = await _dbContext.HistorialRecuperacionToken.Where(u => u.sCorreo == historialToken.sCorreo && u.bActivo == true).ExecuteUpdateAsync(x => x.SetProperty(y => y.bActivo, false).SetProperty(y => y.dtFechaModificacion, DateTime.UtcNow));
-
-                var token = DbRecuperacionToken.MapEntity(historialToken);
-
-                token.uIdHistorialRecuperacionToken = Guid.NewGuid();
-
-
-                _dbContext.HistorialRecuperacionToken.Add(token);
-
-                int i = await _dbContext.SaveChangesAsync();
-
-                if (i != 0)
-                {
-
-                    response.SetSuccess(true);
-                }
-                else
-                {
-                    response.SetError(Menssages.DatErrorTokenRecover);
-                }
-            }
-            catch (Exception ex)
-            {
-                response.ErrorCode = 67823462700994;
-                response.SetError(ex);
-
-                _logger.LogError(IMDSerializer.Serialize(67823462700994, $"Error en {metodo}(EntHistorialRecuperacionToken historialToken): {ex.Message}", historialToken, ex, response));
             }
             return response;
         }
@@ -661,42 +619,7 @@ namespace AppMonederoCommand.Data.Queries.Usuarios
             return response;
         }
 
-        public async Task<IMDResponse<bool>> DUpdateHistorialRecuperacionToken(Guid uIdUsuario, string token)
-        {
-            IMDResponse<bool> response = new IMDResponse<bool>();
-
-            string metodo = nameof(this.DUpdateHistorialRecuperacionToken);
-            _logger.LogInformation(IMDSerializer.Serialize(67823462798119, $"Inicia {metodo}(Guid uIdUsuario, string token)", uIdUsuario, token));
-
-            try
-            {
-                var queryExisteActivo = await _dbContext.HistorialRecuperacionToken.SingleOrDefaultAsync(u => u.uIdUsuario == uIdUsuario && u.sToken == token);
-
-                if (queryExisteActivo != null)
-                {
-                    queryExisteActivo.bActivo = false;
-                    int x = await _dbContext.SaveChangesAsync();
-
-                    if (x != 0)
-                    {
-                        response.SetSuccess(true);
-                    }
-                    else
-                    {
-                        response.SetError(Menssages.DatNoUpdatePassword);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                response.ErrorCode = 67823462798896;
-                response.SetError(ex);
-
-                _logger.LogError(IMDSerializer.Serialize(67823462798896, $"Error en {metodo}(Guid uIdUsuario, string token): {ex.Message}", uIdUsuario, token, ex, response));
-            }
-            return response;
-        }
-
+       
         public async Task<IMDResponse<bool>> DUpdateContrasena(Guid uIdUsuario, EntNuevaContrasena contrasena, string token)
         {
             IMDResponse<bool> response = new IMDResponse<bool>();
@@ -1119,97 +1042,6 @@ namespace AppMonederoCommand.Data.Queries.Usuarios
             return response;
         }
 
-        public async Task<IMDResponse<bool>> DGetTokenValido(Guid uIdUsuario, string sCorreo, string sToken)
-        {
-            IMDResponse<bool> response = new IMDResponse<bool>();
-
-            string metodo = nameof(this.DGetTokenValido);
-            _logger.LogInformation(IMDSerializer.Serialize(67823462704879, $"Inicia {metodo}(Guid uIdUsuario, string sCorreo, string sToken)", uIdUsuario, sCorreo, sToken));
-
-            try
-            {
-                DateTime tokenValido = DateTime.UtcNow;
-
-                var queryToken = await _dbContext.HistorialRecuperacionToken.FirstOrDefaultAsync(u =>
-                u.uIdUsuario == uIdUsuario &&
-                u.sCorreo == sCorreo &&
-                u.sToken == sToken &&
-                tokenValido < u.dtFechaVencimiento &&
-                u.bActivo == true
-                );
-
-                if (queryToken == null)
-                {
-                    var queryTokenInactivo = await _dbContext.HistorialRecuperacionToken.FirstOrDefaultAsync(u =>
-                    u.uIdUsuario == uIdUsuario &&
-                    u.sCorreo == sCorreo &&
-                    u.sToken == sToken);
-
-                    if (queryTokenInactivo != null)
-                    {
-                        queryTokenInactivo.bActivo = false;
-                        queryTokenInactivo.dtFechaModificacion = DateTime.UtcNow;
-
-                        int i = await _dbContext.SaveChangesAsync();
-
-                        if (i != 0)
-                        {
-                            response.SetError(Menssages.DatTimeOutAccount);
-                        }
-                        else
-                        {
-                            response.SetError(Menssages.DatTimeTerminateAccount);
-                            //Termina update
-                        }
-                    }
-                    else
-                    {
-                        response.SetError(Menssages.DatNoRegisteredToken);
-                    }
-                }
-                else
-                {
-                    response.SetSuccess(true);
-                }
-            }
-            catch (Exception ex)
-            {
-                response.ErrorCode = 67823462705656;
-                response.SetError(ex);
-
-                _logger.LogError(IMDSerializer.Serialize(67823462705656, $"Error en {metodo}(Guid uIdUsuario, string sCorreo, string sToken): {ex.Message}", uIdUsuario, sCorreo, sToken, ex, response));
-            }
-            return response;
-        }
-
-        public async Task<IMDResponse<EntHistorialRecuperacionToken>> DGetHistorialTokenRecuperarCuenta(string correo, string token)
-        {
-            IMDResponse<EntHistorialRecuperacionToken> response = new IMDResponse<EntHistorialRecuperacionToken>();
-
-            string metodo = nameof(this.DGetHistorialTokenRecuperarCuenta);
-            _logger.LogInformation(IMDSerializer.Serialize(67823462746837, $"Inicia {metodo}(string correo, string token)", correo, token));
-
-            try
-            {
-                var datosToken = await _dbContext.HistorialRecuperacionToken.Where(w => w.sCorreo == correo && w.sToken == token && w.bActivo == true).FirstOrDefaultAsync();
-                if (datosToken != null)
-                {
-                    response.SetSuccess(BusRecuperacionToken.MapEntity(datosToken));
-                }
-                else
-                {
-                    response.SetError(Menssages.DatNoExistRegister);
-                }
-            }
-            catch (Exception ex)
-            {
-                response.ErrorCode = 67823462747614;
-                response.SetError(ex.Message);
-
-                _logger.LogError(IMDSerializer.Serialize(67823462747614, $"Error en {metodo}(string correo, string token): {ex.Message}", correo, token, ex, response));
-            }
-            return response;
-        }
 
         [IMDMetodo(67823462788018, 67823462787241)]
         public async Task<IMDResponse<EntUsuario>> DGetByAppleId(string sAppleId)

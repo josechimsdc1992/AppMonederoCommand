@@ -16,4 +16,8 @@
     <ProjectReference Include="..\AppMonederoCommand.Business\AppMonederoCommand.Business.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Entities\RecuperacionTokens\" />
+  </ItemGroup>
+
 </Project>

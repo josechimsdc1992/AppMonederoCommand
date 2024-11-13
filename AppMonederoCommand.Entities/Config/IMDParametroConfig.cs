@@ -1,5 +1,4 @@
-﻿using AppMonederoCommand.Entities.Boletos.ResponseHTTP.EntResponseHTTP;
-using AppMonederoCommand.Entities.Catalogos;
+﻿using AppMonederoCommand.Entities.Catalogos;
 using AppMonederoCommand.Entities.Replicas;
 using AppMonederoCommand.Entities.TipoOperaciones;
 using AppMonederoCommand.Entities.TipoTarifa;

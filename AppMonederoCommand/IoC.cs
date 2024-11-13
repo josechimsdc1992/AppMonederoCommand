@@ -34,11 +34,6 @@ namespace AppMonederoCommand.Api
             #endregion
 
 
-            #region Historial recuperar cuenta
-            services.AddScoped<IBusHistorialRecuperarCuenta, BusHistorialRecuperarCuenta>();
-            services.AddScoped<IDatHistorialRecuperarCuenta, DatHistorialRecuperarCuenta>();
-            #endregion
-
             #region Peticiones HTTP
             services.AddScoped<IServGenerico, ServGenerico>();
             #endregion

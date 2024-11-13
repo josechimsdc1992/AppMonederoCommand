@@ -15,7 +15,6 @@ public partial class TransporteContext : DbContext
     //Lista de dbsets
     public virtual DbSet<Usuario> Usuario { get; set; }
 
-    public virtual DbSet<HistorialRefreshToken> HistorialRefreshToken { get; set; }
 
     public virtual DbSet<FirebaseToken> FirebaseToken { get; set; }
 
@@ -40,7 +39,6 @@ public partial class TransporteContext : DbContext
         modelBuilder.HasDefaultSchema("APP");
         //configuración de tablas
         modelBuilder.ApplyConfiguration(new MapUsuario());
-        modelBuilder.ApplyConfiguration(new MapHistorialRefreshToken());
         modelBuilder.ApplyConfiguration(new MapParametros());
         modelBuilder.ApplyConfiguration(new MapFirebaseToken());
         modelBuilder.ApplyConfiguration(new MapHistorialRecuperarCuenta());

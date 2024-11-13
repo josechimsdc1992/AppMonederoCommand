@@ -57,13 +57,7 @@
         Task<IMDResponse<EntUsuario>> BValidaMonederoUsuario(Guid uIdUsuario);
 
         Task<IMDResponse<dynamic>> BDescargaImagenUsuarioApp(Guid uIdUsuario);
-        Task<IMDResponse<EntCodigoCuentaResponse>> BEnviarCodigoEliminacionCuenta(EntCodigoCuentaRequest entCodigoCuentaRequest);
-        Task<IMDResponse<bool>> BConfirmarEliminacionCuenta(EntEliminaCuentaRequest entEliminaCuentaRequest);
         Task<IMDResponse<string>> BGeneraCodigoAlfanumerico(int iLength);
-        Task<IMDResponse<bool>> BSolicitarCambioDispositivo(EntEstatusCuentaRequest entEstatusCuentaRequest);
-        Task<IMDResponse<bool>> BActualizaEstatusCuenta(EntEstatusCuentaUpdate entEstatusCuentaUpdate);
         Task<IMDResponse<bool>> BActualizaDispositivoCuenta(EntDispositivoCuentaUpdate entDispositivoCuentaUpdate);
-        Task<IMDResponse<dynamic>> BVerificaCodigoDispositivo(EntCodigoVerificacion codigo);
-        Task<IMDResponse<bool>> BActualizarEstatusCuenta(EntActualizarEstatusCuenta entActualizarEstatusCuenta);
     }
 }

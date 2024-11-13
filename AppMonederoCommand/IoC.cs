@@ -10,7 +10,6 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IBusUsuario, BusUsuario>();
             services.AddScoped<IBusJwToken, BusJwToken>();
             services.AddScoped<IBusParametros, BusParametros>();
-            services.AddScoped<IDatHistorialRefreshToken, DatHistorialRefreshToken>();
             services.AddScoped<IDatUsuario, DatUsuario>();
             services.AddScoped<IDatParametros, DatParametros>();
             services.AddScoped<IDatUsuarioActualizaTelefono, DatUsuarioActualizaTelefono>();

@@ -30,7 +30,6 @@ global using AppMonederoCommand.Data;
 global using AppMonederoCommand.Data.Mapping;
 global using AppMonederoCommand.Data.Queries;
 global using AppMonederoCommand.Data.Queries.Catalogos;
-global using AppMonederoCommand.Data.Queries.Jwt;
 global using AppMonederoCommand.Data.Queries.Monedero;
 global using AppMonederoCommand.Data.Queries.Monedero.Folio;
 global using AppMonederoCommand.Data.Queries.Parametro;

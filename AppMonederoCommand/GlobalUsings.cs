@@ -11,7 +11,6 @@ global using AppMonederoCommand.Business.Interfaces.Parametro;
 global using AppMonederoCommand.Business.Interfaces.Tarifa;
 global using AppMonederoCommand.Business.Interfaces.Tarjeta;
 global using AppMonederoCommand.Business.Interfaces.Usuarios;
-global using AppMonederoCommand.Business.JWTService;
 global using AppMonederoCommand.Business.Lenguaje;
 global using AppMonederoCommand.Business.Mapping;
 global using AppMonederoCommand.Business.Monedero;

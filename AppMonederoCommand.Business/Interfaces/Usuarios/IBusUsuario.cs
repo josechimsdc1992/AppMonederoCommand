@@ -13,8 +13,6 @@
   */
     public interface IBusUsuario
     {
-        Task<IMDResponse<dynamic>> BIniciaSesionToken(EntRefreshTokenRequest pToken, string sIdAplicacion);
-        Task<IMDResponse<dynamic>> BVerificaCodigo(EntCodigoVerificacion codigo);
         Task<IMDResponse<dynamic>> BReenviarCodigo(EntReenviaCodigo solicitud);
         Task<IMDResponse<dynamic>> BCambiaContrasena(Guid uIdUsuario, EntNuevaContrasena password);
         Task<IMDResponse<bool>> BGuardaFireBaseToken(Guid uIdUsuario, string sFcmToken, string sInfoAppOS, string? sIdAplicacion);

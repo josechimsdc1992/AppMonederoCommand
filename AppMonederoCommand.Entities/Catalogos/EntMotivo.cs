@@ -1,4 +1,6 @@
-﻿using AppMonederoCommand.Data.Entities.Tarjeta;
+﻿
+using AppMonederoCommand.Entities.Tarjetas;
+using AppMonederoCommand.Entities.TarjetaUsuario;
 
 namespace AppMonederoCommand.Entities.Catalogos
 {
@@ -13,6 +15,6 @@ namespace AppMonederoCommand.Entities.Catalogos
         public bool? bPermitirOperaciones { get; set; }
         public bool? bPermitirReactivar { get; set; }
         public bool? bPermitirEditar { get; set; }
-        public IEnumerable<EntTarjetas> lstTarjetas { get; set; }
+        public IEnumerable<EntTarjetas_> lstTarjetas { get; set; }
     }
 }

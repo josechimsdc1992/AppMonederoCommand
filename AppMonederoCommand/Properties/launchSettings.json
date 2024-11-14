@@ -49,9 +49,9 @@
         "SYSTEM-USER-PASSWORD": "NLuWZU8+B5Xj7Q9DKhl19A==",
         "MONEDEROC_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/monederoc",
         "USE_OCI_CONECTION": "0",
-        "APP_API_KEY": "AppMonederoCommand_A8UF7lYs9U7TmTzOV5UA8e2bNUD6w9WPVhdSxdgDve6eiLdWhcraV",
+        "APP_API_KEY": "appService_A8UF7lYs9U7TmTzOV5UA8e2bNUD6w9WPVhdSxdgDve6eiLdWhcraV",
         "ERROR_CODE_SESION": "412",
-        "NOTIFICATION_SERVICE_ENABLE": "0"
+        "NOTIFICATION_SERVICE_ENABLE": "1"
       }
     }
   }

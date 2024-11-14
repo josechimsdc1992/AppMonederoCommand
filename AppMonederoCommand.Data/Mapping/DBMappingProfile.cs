@@ -1,4 +1,5 @@
-﻿using AppMonederoCommand.Data.Entities.TiposTarifa;
+﻿using AppMonederoCommand.Data.Entities.Tarjeta;
+using AppMonederoCommand.Data.Entities.TiposTarifa;
 
 namespace AppMonederoCommand.Data.Mapping;
 
@@ -55,6 +56,8 @@ public class DBMappingProfile : Profile
         CreateMap<EntMotivo, Motivo>().ReverseMap();
 
         CreateMap<EntTipoOperaciones, TipoOperaciones>().ReverseMap();
+
+        CreateMap<EntReadTarjetas, EntTarjetas>();
     }
 
     private Guid GetGuid()

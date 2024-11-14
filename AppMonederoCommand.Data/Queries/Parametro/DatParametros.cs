@@ -143,7 +143,7 @@
 
             try
             {
-                var listaParametros = await _dbContext.Parametros.Where(x => claves.Contains(x.sNombre) && x.bActivo).ToListAsync();
+                var listaParametros = await _dbContext.Parametros.Where(x => claves.Contains(x.sNombre) ).ToListAsync();
                 if (listaParametros != null)
                 {
                     var listaEntParametros = BusMapper.MapList(listaParametros);

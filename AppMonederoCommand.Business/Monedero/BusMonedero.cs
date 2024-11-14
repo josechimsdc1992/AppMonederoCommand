@@ -628,8 +628,8 @@ public class BusMonedero : IBusMonedero
 
         try
         {
-            int numeroTarjeta = 0;
-            int.TryParse(sNumeroTarjeta,out numeroTarjeta);
+            long numeroTarjeta = 0;
+            long.TryParse(sNumeroTarjeta,out numeroTarjeta);
             EntOperacionesPermitidasTarjeta operacionesPermitidas = new EntOperacionesPermitidasTarjeta();
 
 

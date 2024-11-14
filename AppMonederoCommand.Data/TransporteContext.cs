@@ -1,3 +1,5 @@
+
+
 using AppMonederoCommand.Data.Entities.Tarjeta;
 
 namespace AppMonederoCommand.Data;
@@ -37,6 +39,7 @@ public partial class TransporteContext : DbContext
         modelBuilder.ApplyConfiguration(new MapTiposTarifa());
         modelBuilder.ApplyConfiguration(new MapMotivo());
         modelBuilder.ApplyConfiguration(new MapTipoOperaciones());
+        modelBuilder.ApplyConfiguration(new MapTarjetas());
 
         OnModelCreatingPartial(modelBuilder);
     }

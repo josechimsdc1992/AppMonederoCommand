@@ -1,5 +1,4 @@
-﻿using AppMonederoCommand.Data.Entities.Tarjeta;
-using IMD.Utils.Interfaces;
+﻿using IMD.Utils.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

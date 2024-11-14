@@ -67,7 +67,6 @@ namespace AppMonederoCommand.Data.Mapping.Tarjetas
             builder.Property(e => e.uIdMonedero)
                 .HasColumnType("VARCHAR2(50)")
                 .HasColumnName("UIDMONEDERO")
-                //.HasDefaultValueSql("SYS_GUID()")
                 .HasConversion(new GuidToStringConverter());
 
             builder.Property(e => e.sFolio)
@@ -77,16 +76,6 @@ namespace AppMonederoCommand.Data.Mapping.Tarjetas
             builder.Property(e => e.iNumeroProveedor)
                 .HasColumnName("NUMBER(10)")
                 .HasColumnName("INUMEROPROVEEDOR");
-
-            /*builder.Property(e => e.bPermitirOperaciones)
-              .HasColumnType("NUMBER(1,0)")
-              .HasColumnName("BPERMITIROPERACIONES");
-
-            builder.Property(e => e.bPermitirReactivar)
-               .HasColumnType("NUMBER(1,0)")
-               .HasColumnName("BPERMITIRREACTIVAR");*/
-
-            // builder.ConfigureAuditColumns();
 
             builder.Property(e => e.bActivo)
                 .HasColumnType("NUMBER(1,0)")
@@ -145,8 +134,8 @@ namespace AppMonederoCommand.Data.Mapping.Tarjetas
 
             builder.Property(e => e.uIdUsuarioTarjeta)
                 .HasColumnType("VARCHAR2(50)")
-                .HasColumnName("UIDUSUARIOTARJETA")
-                .HasConversion(new GuidToStringConverter());
+                .HasConversion<string>()
+                .HasColumnName("UIDUSUARIOTARJETA");
 
             builder.Property(e => e.uIdDetalleSolicitud)
               .HasColumnType("VARCHAR2(50)")
@@ -165,16 +154,7 @@ namespace AppMonederoCommand.Data.Mapping.Tarjetas
                 .HasColumnType("DATE")
                 .HasColumnName("DTFECHAVALIDEZ");
 
-            // relationships
-            //builder.HasOne(c => c.entEstatusTarjeta)
-            //    .WithMany(e => e.lstTarjetas)
-            //    .HasForeignKey(c => c.uIdEstatusTarjeta)
-            //    .HasConstraintName("TARJETAS_ESTATUSTARJETA_FK");
-
-            //builder.HasOne(c => c.entSolicitudes)
-            //    .WithMany(e => e.lstTarjetas)
-            //    .HasForeignKey(c => c.uIdSolicitud)
-            //    .HasConstraintName("TARJETAS_SOLICITUD_FK");
+            
 
             builder.HasOne(c => c.entTipoTarifa)
                 .WithMany(e => e.lstTarjetas)
@@ -186,15 +166,7 @@ namespace AppMonederoCommand.Data.Mapping.Tarjetas
                 .HasForeignKey(c => c.uIdMotivo)
                 .HasConstraintName("TARJETAS_MOTIVOS_FK");
 
-            //builder.HasOne(c => c.entUsuarioTarjeta)
-            //    .WithMany(e => e.lstTarjetas)
-            //    .HasForeignKey(c => c.uIdUsuarioTarjeta)
-            //    .HasConstraintName("TARJETAS_USUARIO_FK");
-
-            //builder.HasOne(c => c.entDetalleSolicitud)
-            //    .WithMany(e => e.lstTarjetas)
-            //    .HasForeignKey(c => c.uIdDetalleSolicitud)
-            //    .HasConstraintName("TARJETAS_DETALLESOLICITUD_FK");
+            
         }
     }
 }

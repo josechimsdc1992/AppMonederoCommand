@@ -58,6 +58,8 @@ public class DBMappingProfile : Profile
         CreateMap<EntTipoOperaciones, TipoOperaciones>().ReverseMap();
 
         CreateMap<EntReadTarjetas, EntTarjetas>();
+
+        CreateMap<EntTarjetas, EntReadTarjetas>();
     }
 
     private Guid GetGuid()

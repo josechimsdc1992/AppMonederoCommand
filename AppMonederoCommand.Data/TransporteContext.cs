@@ -30,7 +30,7 @@ public partial class TransporteContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("APP");
+        modelBuilder.HasDefaultSchema("APPMONEDEROCOMMAND");
         //configuración de tablas
         modelBuilder.ApplyConfiguration(new MapUsuario());
         modelBuilder.ApplyConfiguration(new MapParametros());

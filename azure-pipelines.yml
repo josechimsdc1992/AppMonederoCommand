@@ -1,4 +1,4 @@
-﻿name: catalogos
+﻿name: appmonederocommand
 trigger:
   branches:
     include:
@@ -20,7 +20,7 @@ pool:
 
 variables:
   - name: prefix
-    value: catalogos 
+    value: appmonederocommand 
   - ${{ if eq(variables['Build.SourceBranchName'], 'production') }}:
     - group: Entorno_Produccion
   - ${{ if eq(variables['Build.SourceBranchName'], 'qa') }}:
@@ -34,7 +34,7 @@ variables:
   - name: service
     value: $(prefix)-service
   - name: projectFile
-    value: Catalogos.Web/Catalogos.Api.csproj
+    value: AppMonederoCommand/AppMonederoCommand.Api.csproj
  
 steps:
   - script: |

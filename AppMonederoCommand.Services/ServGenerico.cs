@@ -120,7 +120,9 @@ public class ServGenerico : IServGenerico
                 }
             }
 
-            var result = await httpClient.PostAsJsonAsync($"{pUrlBase}/{pUrlContoller}", pParam);
+            string path = $"{pUrlBase}/{pUrlContoller}";
+            _logger.LogInformation("POST_URL:"+path);
+            var result = await httpClient.PostAsJsonAsync(path, pParam);
 
             var stringRe = result.Content.ReadAsStringAsync().Result;
             var httpResponse = JsonConvert.DeserializeObject<IMDResponse<object>>(stringRe);

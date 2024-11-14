@@ -8,3 +8,4 @@ data:
   SERVICE_NAME: "App Monedero Command Service"
   APP_API_KEY: "AppMonederoCommand_A8UF7lYs9U7TmTzOV5UA8e2bNUD6w9WPVhdSxdgDve6eiLdWhcraV"
   ERROR_CODE_SESION: "412"
+  NOTIFICATION_SERVICE_ENABLE: "1"

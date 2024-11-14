@@ -1,5 +1,6 @@
 ﻿using AppMonederoCommand.Business.Clases;
 using AppMonederoCommand.Entities.Auth;
+using AppMonederoCommand.Entities.Config;
 using AppMonederoCommand.Entities.Sender;
 using IMD.Utils.ImasD;
 using Newtonsoft.Json;
@@ -19,27 +20,19 @@ namespace AppMonederoCommand.Business;
 public class AuthService : IAuthService
 {
     private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
-    private string _URLBase;
-    private string _endPointAuth;
-    private string _userApp;
-    private string _passwordApp;
     private readonly ILogger<AuthService> _logger;
     private readonly IServGenerico _servGenerico;
-    private string PCKEY;
-    private string PCIV;
     DataStorage _storage;
+    private readonly IMDServiceConfig _iMDServiceConfig;
+    private readonly IMDEnvironmentConfig _iMDEnvironmentConfig;
 
-    public AuthService(ILogger<AuthService> logger, IServGenerico servGenerico, DataStorage storage)
+    public AuthService(ILogger<AuthService> logger, IServGenerico servGenerico, DataStorage storage,IMDServiceConfig iMDServiceConfig, IMDEnvironmentConfig iMDEnvironmentConfig)
     {
-        _URLBase = Environment.GetEnvironmentVariable("URLBASE_AUTHENTICATION") ?? string.Empty;
-        _endPointAuth = Environment.GetEnvironmentVariable("ENDPOINT_AUTHENTICATION") ?? string.Empty;
-        _userApp = Environment.GetEnvironmentVariable("SYSTEM-USER-NAME") ?? string.Empty;
-        _passwordApp = Environment.GetEnvironmentVariable("SYSTEM-USER-PASSWORD") ?? string.Empty;
-        PCKEY = Environment.GetEnvironmentVariable("PCKEY") ?? "";
-        PCIV = Environment.GetEnvironmentVariable("PCIV") ?? "";
         _logger = logger;
         _servGenerico = servGenerico;
         _storage = storage;
+        _iMDServiceConfig = iMDServiceConfig;
+        _iMDEnvironmentConfig = iMDEnvironmentConfig;
     }
 
     public async Task<IMDResponse<EntKongLoginResponse>> BIniciarSesion()
@@ -114,11 +107,11 @@ public class AuthService : IAuthService
             {
                 _logger.LogInformation($"[NOTVALID]Solicitud nueva para actualizacion token y actualización");
                 dynamic usuario = new ExpandoObject();
-                usuario.sUserName = IMDSecurity.BDecrypt(_userApp, PCKEY, PCIV);
-                usuario.sPassword = IMDSecurity.BDecrypt(_passwordApp, PCKEY, PCIV);
+                usuario.sUserName = _iMDServiceConfig.Seguridad_UserName;
+                usuario.sPassword = _iMDServiceConfig.Seguridad_Password;
 
                 usuarioInfo = usuario;
-                usuarioResponse = await _servGenerico.SPostBody(_URLBase, _endPointAuth, usuarioInfo, null);
+                usuarioResponse = await _servGenerico.SPostBody(_iMDServiceConfig.Seguridad_Host, _iMDServiceConfig.Seguridad_Login, usuarioInfo, null);
 
                 if (usuarioResponse.HasError)
                 {
@@ -141,7 +134,7 @@ public class AuthService : IAuthService
             response.ErrorCode = 67823462020342;
             response.SetError(ex);
 
-            _logger.LogError(IMDSerializer.Serialize(67823462020342, $"Error en {metodo}(EntLogin pUsuario): {ex.Message}", _URLBase, _endPointAuth, usuarioInfo, usuarioResponse, ex, response));
+            _logger.LogError(IMDSerializer.Serialize(67823462020342, $"Error en {metodo}(EntLogin pUsuario): {ex.Message}", usuarioInfo, usuarioResponse, ex, response));
         }
         return response;
     }

@@ -1,5 +1,6 @@
 ﻿using AppMonederoCommand.Business.Clases;
 using AppMonederoCommand.Entities.Auth;
+using AppMonederoCommand.Entities.Config;
 using AppMonederoCommand.Entities.Sender;
 using Azure;
 using Azure.Core;
@@ -19,13 +20,17 @@ namespace AppMonederoCommand.Api.TokenServices
         private readonly string ServiceName = "TokenService";
         private bool hasSubscribed = false;
         private Timer? _timer;
+        private readonly IMDServiceConfig _iMDServiceConfig;
+        private readonly IMDEnvironmentConfig _iMDEnvironmentConfig;
 
-        public TokenService(ILogger<TokenService> logger, ExchangeConfig exchangeConfig, IServiceScopeFactory serviceScopeFactory, DataStorage dataStorage)
+        public TokenService(ILogger<TokenService> logger, ExchangeConfig exchangeConfig, IServiceScopeFactory serviceScopeFactory, DataStorage dataStorage, IMDServiceConfig iMDServiceConfig, IMDEnvironmentConfig iMDEnvironmentConfig)
         {
             _logger = logger;
             _exchangeConfig = exchangeConfig;
             _serviceScopeFactory = serviceScopeFactory;
             _storage = dataStorage;
+            _iMDServiceConfig = iMDServiceConfig;
+            _iMDEnvironmentConfig = iMDEnvironmentConfig;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -88,23 +93,17 @@ namespace AppMonederoCommand.Api.TokenServices
                 if (bGeneraConsulta)
                 {
                     dynamic usuario = new ExpandoObject();
-                    string PCKEY = Environment.GetEnvironmentVariable("PCKEY") ?? "";
-                    string PCIV = Environment.GetEnvironmentVariable("PCIV") ?? "";
-                    string _URLBase = Environment.GetEnvironmentVariable("URLBASE_AUTHENTICATION") ?? string.Empty;
-                    string _endPointAuth = Environment.GetEnvironmentVariable("ENDPOINT_AUTHENTICATION") ?? string.Empty;
-                    string _userApp = Environment.GetEnvironmentVariable("SYSTEM-USER-NAME") ?? string.Empty;
-                    string _passwordApp = Environment.GetEnvironmentVariable("SYSTEM-USER-PASSWORD") ?? string.Empty;
-
-                    usuario.sUserName = IMDSecurity.BDecrypt(_userApp, PCKEY, PCIV);
-                    usuario.sPassword = IMDSecurity.BDecrypt(_passwordApp, PCKEY, PCIV);
+                    
+                    usuario.sUserName = IMDSecurity.BDecrypt(_iMDServiceConfig.Seguridad_UserName, _iMDEnvironmentConfig.PCKEY, _iMDEnvironmentConfig.PCIV);
+                    usuario.sPassword = IMDSecurity.BDecrypt(_iMDServiceConfig.Seguridad_Password, _iMDEnvironmentConfig.PCKEY, _iMDEnvironmentConfig.PCIV);
                     var request = new
                     {
                         sUserName = usuario.sUserName,
                         sPassword = usuario.sPassword
                     };
 
-                    HttpClient httpClient = IMDRestClient.CreateClient(_URLBase);
-                    var usuarioResponse = await IMDRestClient.PostAsync<IMDResponse<EntKongLoginResponse>, object>(httpClient, _endPointAuth, request);
+                    HttpClient httpClient = IMDRestClient.CreateClient(_iMDServiceConfig.Seguridad_Host);
+                    var usuarioResponse = await IMDRestClient.PostAsync<IMDResponse<EntKongLoginResponse>, object>(httpClient, _iMDServiceConfig.Seguridad_Login, request);
                     if (!usuarioResponse.HasError)
                     {
 

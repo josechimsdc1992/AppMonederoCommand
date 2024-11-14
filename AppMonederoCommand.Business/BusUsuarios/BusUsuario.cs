@@ -20,8 +20,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
         private readonly IAuthService _auth;
         private readonly IServGenerico _servGenerico;
         private readonly string _urlHttpClientMonederoC;
-        //Favoritos
-        private readonly string _urlCatalogo = Environment.GetEnvironmentVariable("URLBASE_PAQUETES") ?? "";
         //Azure Blob Storage
         private readonly IServAzureBlobStorage _servAzureBlobStorage;
         private readonly string _errorCodeSesion = Environment.GetEnvironmentVariable("ERROR_CODE_SESION") ?? "";

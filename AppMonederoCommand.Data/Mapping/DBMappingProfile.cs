@@ -1,5 +1,6 @@
 ﻿using AppMonederoCommand.Data.Entities.Tarjeta;
 using AppMonederoCommand.Data.Entities.TiposTarifa;
+using AppMonederoCommand.Entities.TipoTarifa;
 
 namespace AppMonederoCommand.Data.Mapping;
 
@@ -60,6 +61,12 @@ public class DBMappingProfile : Profile
         CreateMap<EntReadTarjetas, EntTarjetas>();
 
         CreateMap<EntTarjetas, EntReadTarjetas>();
+
+        CreateMap<TiposTarifa, EntReadTipoTarifas>()
+            .ForMember(dest => dest.idTipoTarifa, opt => opt.MapFrom(src => src.uIdTipoTarifa))
+            .ForMember(dest => dest.claveTarifa, opt => opt.MapFrom(src => src.sClaveTipoTarifa))
+            .ForMember(dest => dest.tipoTarjeta, opt => opt.MapFrom(src => src.iTipoTarjeta));
+        CreateMap<EntReadTipoTarifas, TiposTarifa>();
     }
 
     private Guid GetGuid()

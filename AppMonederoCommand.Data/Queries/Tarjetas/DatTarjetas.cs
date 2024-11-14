@@ -119,7 +119,7 @@ namespace AppMonederoCommand.Data.Queries.Tarjetas
             {
                 //await BulkOperations.DesconectarEntidadesAsync(_DbContext);
 
-                var query = _DbContext.Tarjetas.AsNoTracking().FirstOrDefault(u => u.iNumeroTarjeta == plTarjeta);
+                var query = _DbContext.Tarjetas.Include(x=>x.entTipoTarifa).Include(x=>x.entMotivos).AsNoTracking().FirstOrDefault(u => u.iNumeroTarjeta == plTarjeta);
                 var result = _mapper.Map<EntReadTarjetas>(query);
                 response.SetSuccess(result);
             }

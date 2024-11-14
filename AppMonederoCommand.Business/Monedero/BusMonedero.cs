@@ -89,8 +89,8 @@ public class BusMonedero : IBusMonedero
             //Valida tarjeta origen
             if (!string.IsNullOrEmpty(entTransferir.sNumeroTarjetaOrigen))
             {
-                int numeroTarjetaOrigen = 0;
-                int.TryParse(entTransferir.sNumeroTarjetaOrigen, out numeroTarjetaOrigen);
+                long numeroTarjetaOrigen = 0;
+                long.TryParse(entTransferir.sNumeroTarjetaOrigen, out numeroTarjetaOrigen);
 
                 IMDResponse<EntReadTarjetas> resTarjetaOrigen =await _busTarjetas.BGetByNumTarjeta(numeroTarjetaOrigen);
                 
@@ -154,8 +154,8 @@ public class BusMonedero : IBusMonedero
 
             if (!string.IsNullOrEmpty(entTransferir.sNumeroTarjetaDestino))
             {
-                int numeroTarjetaDestino = 0;
-                int.TryParse(entTransferir.sNumeroTarjetaDestino, out numeroTarjetaDestino);
+                long numeroTarjetaDestino = 0;
+                long.TryParse(entTransferir.sNumeroTarjetaDestino, out numeroTarjetaDestino);
 
                 IMDResponse<EntReadTarjetas> resTarjetaDestino = await _busTarjetas.BGetByNumTarjeta(numeroTarjetaDestino);
 

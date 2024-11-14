@@ -357,15 +357,15 @@ namespace AppMonederoCommand.Business.Parametro
             }
 
             IMDResponse<List<EntReplicaTipoTarifas>> resTipoTarifa = await _busTipoTarifa.BGetAll();
-            if (!res.HasError)
+            if (!resTipoTarifa.HasError)
             {
                 _IMDParametroConfig.TipoTarifas = resTipoTarifa.Result;
             }
 
             IMDResponse<List<EntMotivo>> resMotivos = await _busMotivos.BObtenerTodos();
-            if (!res.HasError)
+            if (!resMotivos.HasError)
             {
-                _IMDParametroConfig.TipoTarifas = resTipoTarifa.Result;
+                _IMDParametroConfig.Motivos = resMotivos.Result;
             }
 
         }

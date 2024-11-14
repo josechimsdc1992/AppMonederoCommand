@@ -101,7 +101,7 @@ public class MonederoController : ControllerBase
 
 
                     IMDResponse<EntReadTarjetas> resTarjetaOrigen =await _busTarjeta.BGetByuIdMonedero(entTransferirSaldo.uIdMonederoOrigen);
-                    if (!resTarjetaOrigen.HasError)
+                    if (!resTarjetaOrigen.HasError && resTarjetaOrigen.Result!=null)
                     {
                         sOrigen = resTarjetaOrigen.Result.iNumeroTarjeta + "-T";
                     }
@@ -115,7 +115,7 @@ public class MonederoController : ControllerBase
                     }
 
                     IMDResponse<EntReadTarjetas> resTarjetaDestino = await _busTarjeta.BGetByuIdMonedero(entTransferirSaldo.uIdMonederoDestino);
-                    if (!resTarjetaDestino.HasError)
+                    if (!resTarjetaDestino.HasError && resTarjetaDestino.Result!=null)
                     {
                         sDestino = resTarjetaDestino.Result.iNumeroTarjeta + "-T";
                     }

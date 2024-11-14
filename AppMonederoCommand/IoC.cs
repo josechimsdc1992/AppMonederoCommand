@@ -14,9 +14,6 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IBusUsuariosWeb, BusUsuariosWeb>();
             #endregion
 
-            #region Notificaciones
-            services.AddScoped<IBusNotificaciones, BusNotificaciones>();
-            #endregion
 
             #region Monedero
             services.AddScoped<IBusMonedero, BusMonedero>();

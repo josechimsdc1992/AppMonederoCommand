@@ -37,7 +37,7 @@
         "DB_CONNECTION_STRING": "sx2OgGWthvot8Yqgq9ZNY63OYXPEvO/bbiZKl5bDodqFHsJr23LUa9S1SDaLH4wBCp4yAVjwNbPIpEuNAkfjYilVVbraFu82tWZc3MCRXsyXrjZNlvconBFM9pat2ugJW83QufQx2Y0MljrhTNFGLYMcGTDIguTdnkeiwUGBC7I+Puoo/N0OV/9g9d6SCJLSoN8roNGCjOTuGekJBc52NQEfT72yAWn3qZ63BLKPFmGne0Vb1z2C/7hR61kZN3Pfe7HJsrHmKoqdqbsLBCtvVUNmxAj0rmfuhZkcFTty/YvDg3llIPgpZaorLDHSnFNe",
         "PCKEY": "9gug89RF0vtEpca7",
         "PCIV": "BbTXA43B",
-        "SERVICE_NAME": "App Service",
+        "SERVICE_NAME": "App Monedero Command Service",
         "RABBITMQ_HOST": "rabbitmq.qa-transporte.mrptechnology.mx",
         "RABBITMQ_PORT": "5672",
         "RABBITMQ_USERNAME": "user_imd",

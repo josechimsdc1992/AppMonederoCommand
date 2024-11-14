@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalogos-env
+  annotations:
+    reloader.stakater.com/match: "true"
+data:
+  SERVICE_NAME: "App Monedero Command Service"
+  APP_API_KEY: "AppMonederoCommand_A8UF7lYs9U7TmTzOV5UA8e2bNUD6w9WPVhdSxdgDve6eiLdWhcraV"
+  ERROR_CODE_SESION: "412"

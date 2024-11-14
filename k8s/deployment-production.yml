@@ -1,0 +1,131 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appmonederocommand-service
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: appmonederocommand-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: appmonederocommand-service
+    spec:
+      containers:
+        - name: appmonederocommand-service
+          image: transporteregistrypro.azurecr.io/transporte/appmonederocommand-service:production
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+              name: microservices-configmap
+            - configMapRef:
+              name: appmonederocommand-env
+            - configMapRef:
+              name: common-env
+          env:
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: username
+
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: password
+
+            - name: RABBITMQ_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: host
+
+            - name: RABBITMQ_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mq-cluster-default-user
+                  key: port
+
+            - name: RABBITMQ_EXCHANGE
+              valueFrom:
+                secretKeyRef:
+                  name: env-config
+                  key: exchange
+
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: db-connection-encrypt
+                  key: appmonederocommand_service
+
+            - name: PCKEY
+              valueFrom:
+                secretKeyRef:
+                  name: imd-keys
+                  key: key
+
+            - name: PCIV
+              valueFrom:
+                secretKeyRef:
+                  name: imd-keys
+                  key: iv
+
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: seguridad-credentials
+                  key: key
+
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seguridad-credentials
+                  key: secret
+
+            - name: CREDENCIALESUSUARIO
+              valueFrom:
+                configMapKeyRef:
+                  name: common-env
+                  key: SYSTEM-USER-NAME
+
+            - name: CREDENCIALESPASS
+              valueFrom:
+                configMapKeyRef:
+                  name: common-env
+                  key: SYSTEM-USER-PASSWORD
+
+            - name: SEGURIDAD-SERVICE-BASE
+              valueFrom:
+                configMapKeyRef:
+                  name: microservices-configmap
+                  key: SEGURIDAD-SERVICE-BASEURL
+
+            - name: SEGURIDAD-SERVICE-BASEURL
+              valueFrom:
+                configMapKeyRef:
+                  name: microservices-configmap
+                  key: SEGURIDAD-SERVICE-BASEURL
+
+          resources:
+            requests:
+              memory: "300Mi"
+              cpu: "50m"
+            limits:
+              memory: "500Mi"
+              cpu: "100m"
+
+          volumeMounts: # Directorio de los archivos OCI
+            - name: azurefileshare
+              mountPath: /App/WalletOCI
+
+      volumes:
+        - name: azurefileshare
+          azureFile: # Origen de los archivos OCI
+            secretName: storage-secret
+            shareName: adb-k8s
+            readOnly: true

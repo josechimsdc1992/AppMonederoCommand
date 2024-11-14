@@ -1,0 +1,152 @@
+﻿name: catalogos
+trigger:
+  branches:
+    include:
+      - production
+      - qa
+      - development
+  paths:
+    exclude:
+      - k8s/*
+      - .dockerignore
+      - .gitignore
+      - azure-pipelines.yml
+      - Dockerfile
+      - README.md
+      - _NuGet.config
+
+pool:
+  name: default
+
+variables:
+  - name: prefix
+    value: catalogos 
+  - ${{ if eq(variables['Build.SourceBranchName'], 'production') }}:
+    - group: Entorno_Produccion
+  - ${{ if eq(variables['Build.SourceBranchName'], 'qa') }}:
+    - group: Entorno_Pruebas
+  - ${{ if eq(variables['Build.SourceBranchName'], 'development') }}:
+    - group: Entorno_Desarrollo
+  - name: localImage
+    value: imasd/$(prefix)-$(Build.SourceBranchName)
+  - name: image
+    value: "$(azurecr_login)/transporte/$(prefix)-service"
+  - name: service
+    value: $(prefix)-service
+  - name: projectFile
+    value: Catalogos.Web/Catalogos.Api.csproj
+ 
+steps:
+  - script: |
+      echo Entorno_$(entorno)
+    displayName: Entorno
+    
+  - powershell: |
+      $projectFile = "$(projectFile)"
+      $xml = [xml](Get-Content -Path $projectFile)
+      $version = $xml.SelectSingleNode("//Project/PropertyGroup/Version").InnerText
+      echo "Current version is $version"
+      Write-Host "##vso[task.setvariable variable=version]$version"
+    displayName: obtener versión del proyecto
+
+  - powershell: |
+      $projectFile = "$(projectFile)"
+      $packageName = "$(packageName)"
+      $xml = [xml](Get-Content -Path $projectFile)
+      $packageReference = $xml.Project.ItemGroup.PackageReference | Where-Object { $_.Include -eq $packageName}
+      if ($packageReference) {
+        $version = $packageReference.Version
+        echo "La versión de $packageName es: $version"
+        Write-Host "##vso[task.setvariable variable=nugetVersion;]$version"
+      } else {
+        echo "No se encontró la referencia a $packageName en el archivo de proyecto."
+      }
+    displayName: 'Obtener versión de $(packageName)'
+    
+  - task: DownloadPackage@1
+    displayName: Descargando paquete NuGet
+    condition: ne(variables['nugetVersion'], '')
+    inputs:
+      packageType: 'nuget'
+      feed: '/d23af030-9c2b-41ac-8ef9-dd8722c01a0e'
+      view: 'cb387a0c-ec23-4baa-9d2a-97cb16074b3b'
+      definition: '89f35a44-c767-4046-8abf-13a24a39d307'
+      version: '$(nugetVersion)'
+      extract: false
+      downloadPath: '$(Build.ArtifactStagingDirectory)\Packages'
+
+  - powershell: |
+      $version = "$(nugetVersion)"
+      $packageName = "$(packageName)"
+      $downloadPath = "$(Build.ArtifactStagingDirectory)/Packages"
+      $packagePath = "$downloadPath/$packageName.nupkg"
+
+      # Renombrar el archivo NuGet con la versión
+      $newPackagePath = "$downloadPath/$packageName.$version.nupkg"
+      Rename-Item -Path $packagePath -NewName $newPackagePath
+    displayName: Renombrar paquete NuGet y establecer versión
+    condition: ne(variables['nugetVersion'], '')
+
+  - task: CopyFiles@2
+    displayName: 'Copiar paquete NuGet a la carpeta de la solución'
+    condition: ne(variables['nugetVersion'], '')
+    inputs:
+      SourceFolder: '$(Build.ArtifactStagingDirectory)\Packages'
+      Contents: '*.nupkg'
+      TargetFolder: '$(System.DefaultWorkingDirectory)\Packages'
+      CleanTargetFolder: false
+
+  - powershell: |
+      $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
+      docker build -t $(localImage) .
+    displayName: Docker Build
+
+  - powershell: |
+      $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
+      docker tag "$(localImage):latest" "$(image):$(version)"
+      docker tag "$(localImage):latest" "$(image):$(Build.SourceBranchName)"
+      docker tag "$(localImage):latest" "$(image):build-$(Build.BuildId)"
+
+      az acr login --name $(azurecr_name)
+
+      docker push "$(image):$(version)"
+      docker push "$(image):$(Build.SourceBranchName)"
+      docker push "$(image):build-$(Build.BuildId)"
+    displayName: ACR Push
+
+  - powershell: |
+      $env:Path += ";C:\kubectl"
+      
+      $context = kubectl config get-contexts $(k8s-cluster) -o=name
+
+      if ($context -eq $null) {
+        az account set --subscription $(subscription_id)
+        az aks get-credentials --resource-group $(resource_group) --name $(k8s-cluster)
+      }
+
+      kubectl config set-context $(k8s-cluster) --namespace="$(k8s-namespace)"
+      kubectl config use-context $(k8s-cluster)
+
+      # Verifica si el deployment ya existe
+      $existingDeployment = kubectl get deployment $(service) -o=name  --ignore-not-found=true --namespace="$(k8s-namespace)"
+
+      if ($null -eq $existingDeployment) {
+        # Si no existe de crea el deployment
+        kubectl apply -f k8s/deployment-$(Build.SourceBranchName).yml	
+      }
+
+      # Se actualiza la imagen del deployment
+      kubectl set image "deployment/$(service)" "$(service)=$(image):$(version)" --namespace="$(k8s-namespace)"
+      
+
+      # Verifica si el service ya existe
+      $existingService = kubectl get service $(service) -o=name  --ignore-not-found=true --namespace="$(k8s-namespace)"
+
+      if ($null -eq $existingService) {
+        kubectl apply -f k8s/service.yml
+        echo "Service creado para  $(service)"
+      }
+
+
+    displayName: Service Update
+

@@ -48,13 +48,8 @@
         "SYSTEM-USER-NAME": "yerMEPMWHoBtD6CkqLCwPw==",
         "SYSTEM-USER-PASSWORD": "NLuWZU8+B5Xj7Q9DKhl19A==",
         "MONEDEROC_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/monederoc",
-        "AZUREBLOBSTORAGE_KEY": "DefaultEndpointsProtocol=https;AccountName=apptransporteyucatanqa;AccountKey=zih641/DpjSAHeGetpIJm+VfbUi0rIzbUtrdv0HA0tdHgzyL05LK6L6FJ25QCjAiJ5ef6PSkJTBu+AStwl/AAw==;EndpointSuffix=core.windows.net",
-        "TICKETS_URL": "https://api.qa-transporte.mrptechnology.mx/api/v1/tickets",
-        "ENDPOINT_GET_ORDENES_BY_LIST": "Ordenes/obtener/list",
-        "ENDPOINT_GET_TIPOTARIFAS": "TipoTarifas/App?IdTarifas={idTarifas}",
         "USE_OCI_CONECTION": "0",
         "APP_API_KEY": "AppMonederoCommand_A8UF7lYs9U7TmTzOV5UA8e2bNUD6w9WPVhdSxdgDve6eiLdWhcraV",
-        "ENDPOINT_GET_GENEROS": "Generos/list",
         "ERROR_CODE_SESION": "412",
         "NOTIFICATION_SERVICE_ENABLE": "0"
       }

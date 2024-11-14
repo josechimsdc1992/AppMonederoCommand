@@ -16,19 +16,12 @@ namespace AppMonederoCommand.Business.BusUsuarios
         private readonly IMDRabbitNotifications _rabbitNotifications;
         //Parametros
         private readonly IBusParametros _busParametros;
-        //Llamados Http
-        private readonly IAuthService _auth;
-        private readonly IServGenerico _servGenerico;
-        private readonly string _urlHttpClientMonederoC;
-        //Azure Blob Storage
-        private readonly IServAzureBlobStorage _servAzureBlobStorage;
-        private readonly string _errorCodeSesion = Environment.GetEnvironmentVariable("ERROR_CODE_SESION") ?? "";
         private readonly IMDParametroConfig _IMDParametroConfig;
 
         public BusUsuario(ILogger<BusUsuario> logger, IDatUsuario datUusario,
             IServiceProvider serviceProvider, ExchangeConfig exchangeConfig, //Se agrega para crear poder enviar publicación al bus
             IBusParametros busParametros,
-            IAuthService auth, IServGenerico servGenerico, IServAzureBlobStorage servAzureBlobStorage,
+            
             IBusMonedero busMonedero, IBusLenguaje busLenguaje,
             IMDParametroConfig iMDParametroConfig)
         {
@@ -38,10 +31,6 @@ namespace AppMonederoCommand.Business.BusUsuarios
             this._rabbitNotifications = serviceProvider.GetRequiredService<IMDRabbitNotifications>();
             this._exchangeConfig = exchangeConfig;
             this._busParametros = busParametros;
-            this._auth = auth;
-            this._servGenerico = servGenerico;
-            this._urlHttpClientMonederoC = Environment.GetEnvironmentVariable("MONEDEROC_URL") ?? string.Empty;
-            this._servAzureBlobStorage = servAzureBlobStorage;
             _busMonedero = busMonedero;
             _busLenguaje = busLenguaje;
             _IMDParametroConfig = iMDParametroConfig;

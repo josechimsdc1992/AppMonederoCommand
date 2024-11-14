@@ -33,38 +33,20 @@ namespace AppMonederoCommand.Api
             services.AddScoped<IAuthService, AuthService>();
             #endregion
 
-
-
-
-
             #region Folio
             services.AddScoped<IDatFolio, DatFolio>();
             #endregion
-
             #region Lenguajes
             services.AddScoped<IBusLenguaje, BusLenguaje>();
             #endregion
-
-            #region Azure Blob Storage
-            services.AddScoped<IServAzureBlobStorage, ServAzureBlobStorage>();
-            #endregion
-
-            #region Catalogos
-            services.AddScoped<IBusCatalogos, BusCatalogos>();
-            #endregion
-
             #region TiposTarifa
             services.AddScoped<IDatTipoTarifa, DatTipoTarifas>();
             services.AddScoped<IBusTipoTarifa, BusTipoTarifa>();
             #endregion
-
             #region Motivo
             services.AddScoped<IBusMotivos, BusMotivos>();
             services.AddScoped<IDatMotivos, DatMotivos>();
             #endregion
-
-            
-
             #region Tipo Operaciones
             services.AddScoped<IBusTipoOperaciones, BusTipoOperaciones>();
             services.AddScoped<IDatTipoOperaciones, DatTipoOperaciones>();

@@ -56,7 +56,6 @@ global using AppMonederoCommand.Entities.Usuarios.JWTEntities;
 global using AppMonederoCommand.Entities.Usuarios.Login;
 global using AppMonederoCommand.Entities.Usuarios.ReenviarCodigo;
 global using AppMonederoCommand.Services;
-global using AppMonederoCommand.Services.AzureBlobStorage;
 global using AppMonederoCommand.Services.Interfaces;
 global using AppMonederoCommand.Services.Interfaces.AzureBlobStorage;
 global using AutoMapper;

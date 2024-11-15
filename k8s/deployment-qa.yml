@@ -114,4 +114,4 @@ spec:
       volumes:
         - name: folderfiles
           persistentVolumeClaim:
-            claimName: pvc-catalogos-files
+            claimName: pvc-AppMonederoCommand-files
